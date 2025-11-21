@@ -1,13 +1,47 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const result = await signIn("credentials", {
+      email: formData.get("email"),
+      password: formData.get("password"),
+      redirect: false,
+    });
+
+    if (result?.error) {
+      setError(result.error);
+      setIsLoading(false);
+    } else {
+      router.push("/dashboard");
+    }
+  };
+
+  const handleGoogleSignIn = () => {
+    signIn('google', { callbackUrl: '/dashboard' });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
+
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary shadow-lg mb-4">
@@ -23,34 +57,28 @@ export default function LoginPage() {
             <CardTitle>Welcome back</CardTitle>
             <CardDescription>Sign in to your account to continue learning</CardDescription>
           </CardHeader>
+
           <CardContent>
-            <form className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium">
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  className="h-11 rounded-lg border-input focus:ring-2 focus:ring-primary/50"
-                />
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              
+              {error && (
+                <div className="p-3 rounded-lg bg-red-50 text-red-600 text-sm">
+                  {error}
+                </div>
+              )}
+
+              <div>
+                <Label>Email</Label>
+                <Input name="email" type="email" required />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  className="h-11 rounded-lg border-input focus:ring-2 focus:ring-primary/50"
-                />
+              <div>
+                <Label>Password</Label>
+                <Input name="password" type="password" required />
               </div>
 
-              <Button className="w-full h-11 rounded-lg text-base font-semibold bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-200">
-                Continue
+              <Button type="submit" disabled={isLoading} className="w-full h-11 rounded-lg">
+                {isLoading ? 'Signing in...' : 'Continue'}
               </Button>
             </form>
 
@@ -64,9 +92,10 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Google Login */}
+            {/* Google Button */}
             <Button
               type="button"
+              onClick={handleGoogleSignIn}
               variant="outline"
               className="w-full h-11 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors bg-transparent"
             >
@@ -106,5 +135,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,0 +1,10 @@
+var R=require("../../../../chunks/[turbopack]_runtime.js")("server/app/api/auth/[...nextauth]/route.js")
+R.c("server/chunks/76835_next_d3a10b68._.js")
+R.c("server/chunks/76835_next-auth_ebde3727._.js")
+R.c("server/chunks/76835_openid-client_3cbf19c5._.js")
+R.c("server/chunks/76835_jose_dist_node_cjs_c1af0a6b._.js")
+R.c("server/chunks/76835_fa7aa521._.js")
+R.c("server/chunks/[root-of-the-server]__724a78ec._.js")
+R.c("server/chunks/2aa63__next-internal_server_app_api_auth_[___nextauth]_route_actions_c3c436da.js")
+R.m("[project]/Downloads/study-buddy/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/Downloads/study-buddy/app/api/auth/[...nextauth]/route.js [app-route] (ecmascript)\" } [app-route] (ecmascript)")
+module.exports=R.m("[project]/Downloads/study-buddy/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/Downloads/study-buddy/app/api/auth/[...nextauth]/route.js [app-route] (ecmascript)\" } [app-route] (ecmascript)").exports
