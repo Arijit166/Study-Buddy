@@ -184,8 +184,11 @@ export function FileUploadZone({ onUploadSuccess }: { onUploadSuccess?: () => vo
               />
             </div>
             {pendingFile && (
-              <div className="text-sm text-muted-foreground">
-                <p><strong>File:</strong> {pendingFile.file.name}</p>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p className="flex items-start gap-2">
+                  <strong className="flex-shrink-0">File:</strong> 
+                  <span className="break-all">{pendingFile.file.name}</span>
+                </p>
                 <p><strong>Size:</strong> {(pendingFile.file.size / 1024 / 1024).toFixed(2)} MB</p>
               </div>
             )}

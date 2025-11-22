@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { File, Trash2, Download } from "lucide-react"
+import { FileText, Trash2, Download, MessageSquare } from "lucide-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +30,9 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
   const [notes, setNotes] = useState<Note[]>([])
   const [loading, setLoading] = useState(true)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [downloadingId, setDownloadingId] = useState<string | null>(null)
+  const [previews, setPreviews] = useState<Record<string, string>>({})
+  const [loadingPreviews, setLoadingPreviews] = useState<Record<string, boolean>>({})
 
   const fetchNotes = async () => {
     try {
@@ -38,6 +41,10 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
       
       if (response.ok) {
         setNotes(data.notes)
+        // Load previews for each note
+        data.notes.forEach((note: Note) => {
+          loadPreview(note._id, note.fileType)
+        })
       } else {
         toast.error('Failed to load notes')
       }
@@ -46,6 +53,26 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
       toast.error('Failed to load notes')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadPreview = async (id: string, fileType: string) => {
+    setLoadingPreviews(prev => ({ ...prev, [id]: true }))
+    
+    try {
+      const response = await fetch(`/api/notes/${id}/thumbnail`)
+      const data = await response.json()
+
+      if (response.ok && data.thumbnail) {
+        setPreviews(prev => ({
+          ...prev,
+          [id]: `data:${data.type};base64,${data.thumbnail}`
+        }))
+      }
+    } catch (error) {
+      console.error('Preview load error:', error)
+    } finally {
+      setLoadingPreviews(prev => ({ ...prev, [id]: false }))
     }
   }
 
@@ -66,6 +93,11 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
       if (response.ok) {
         toast.success('Note deleted successfully')
         setNotes(notes.filter(note => note._id !== id))
+        setPreviews(prev => {
+          const newPreviews = { ...prev }
+          delete newPreviews[id]
+          return newPreviews
+        })
       } else {
         toast.error(data.error || 'Failed to delete note')
       }
@@ -78,12 +110,12 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
   }
 
   const handleDownload = async (id: string, fileName: string, fileType: string) => {
+    setDownloadingId(id)
     try {
       const response = await fetch(`/api/notes/${id}`)
       const data = await response.json()
 
       if (response.ok) {
-        // Convert base64 to blob
         const byteCharacters = atob(data.fileData)
         const byteNumbers = new Array(byteCharacters.length)
         for (let i = 0; i < byteCharacters.length; i++) {
@@ -92,7 +124,6 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
         const byteArray = new Uint8Array(byteNumbers)
         const blob = new Blob([byteArray], { type: fileType })
 
-        // Create download link
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
@@ -109,6 +140,8 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
     } catch (error) {
       console.error('Download error:', error)
       toast.error('Failed to download file')
+    } finally {
+      setDownloadingId(null)
     }
   }
 
@@ -129,32 +162,42 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
     })
   }
 
-  const getFileIcon = (fileType: string) => {
-    if (fileType.includes('pdf')) return '📄'
-    if (fileType.includes('image')) return '🖼️'
-    return '📎'
-  }
+  const PDFPlaceholder = () => (
+    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-50 to-red-100 rounded-lg">
+      <div className="text-center p-6">
+        <div className="relative inline-block">
+          <div className="absolute -top-1 -left-1 w-24 h-32 bg-red-200 rounded-lg border-2 border-red-300 opacity-40"></div>
+          <div className="absolute -top-0.5 -left-0.5 w-24 h-32 bg-red-100 rounded-lg border-2 border-red-200 opacity-60"></div>
+          <div className="relative w-24 h-32 bg-white rounded-lg border-2 border-red-400 shadow-lg flex flex-col items-center justify-center p-3">
+            <FileText className="w-12 h-12 text-red-500 mb-2" />
+            <div className="space-y-1 w-full">
+              <div className="h-1.5 bg-red-200 rounded w-3/4 mx-auto"></div>
+              <div className="h-1.5 bg-red-200 rounded w-full"></div>
+              <div className="h-1.5 bg-red-200 rounded w-5/6 mx-auto"></div>
+            </div>
+          </div>
+        </div>
+        <p className="text-xs text-red-600 mt-3 font-medium">PDF Document</p>
+      </div>
+    </div>
+  )
 
   if (loading) {
     return (
-      <Card className="border-0 shadow-md">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
     )
   }
 
   if (notes.length === 0) {
     return (
       <Card className="border-0 shadow-md">
-        <CardContent className="p-6">
-          <div className="text-center py-8">
-            <File className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">No notes uploaded yet</p>
-            <p className="text-sm text-muted-foreground mt-1">Upload your first study material to get started</p>
+        <CardContent className="p-12">
+          <div className="text-center">
+            <FileText className="w-20 h-20 text-muted-foreground mx-auto mb-4 opacity-50" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">No notes yet</h3>
+            <p className="text-sm text-muted-foreground">Upload your first study material to get started</p>
           </div>
         </CardContent>
       </Card>
@@ -162,46 +205,79 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
   }
 
   return (
-    <Card className="border-0 shadow-md">
-      <CardContent className="p-6">
-        <h3 className="font-semibold text-foreground mb-4">Your Notes</h3>
-        <div className="space-y-3">
-          {notes.map((note) => (
-            <div 
-              key={note._id} 
-              className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/30 transition-colors"
-            >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="text-2xl flex-shrink-0">
-                  {getFileIcon(note.fileType)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-foreground truncate">{note.name}</p>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-                    <span>{formatDate(note.createdAt)}</span>
-                    <span>•</span>
-                    <span>{formatFileSize(note.fileSize)}</span>
-                    <span>•</span>
-                    <span className="truncate">{note.fileName}</span>
+    <div>
+      <h2 className="text-2xl font-bold text-foreground mb-6">Your Notes ({notes.length})</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {notes.map((note) => (
+          <Card key={note._id} className="border-0 shadow-md hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              {/* Note Name */}
+              <h3 className="text-lg font-semibold text-foreground mb-4 truncate" title={note.name}>
+                {note.name}
+              </h3>
+
+              {/* File Preview */}
+              <div className="mb-4 bg-muted/30 rounded-lg overflow-hidden aspect-video flex items-center justify-center">
+                {loadingPreviews[note._id] ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                   </div>
-                </div>
+                ) : previews[note._id] ? (
+                  <img 
+                    src={previews[note._id]} 
+                    alt={note.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : note.fileType.includes('pdf') ? (
+                  <PDFPlaceholder />
+                ) : (
+                  <FileText className="w-16 h-16 text-muted-foreground" />
+                )}
               </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
+
+              {/* Date and Size */}
+              <div className="flex items-center justify-between text-sm text-muted-foreground mb-6 pb-6 border-b">
+                <span className="flex items-center gap-2">
+                  📅 {formatDate(note.createdAt)}
+                </span>
+                <span className="flex items-center gap-2">
+                  💾 {formatFileSize(note.fileSize)}
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDownload(note._id, note.fileName, note.fileType)}
-                  className="h-8 w-8 p-0"
+                  className="flex-1 gap-2 h-11"
+                  onClick={() => toast.info('Chat feature coming soon!')}
                 >
-                  <Download className="w-4 h-4" />
+                  <MessageSquare className="w-4 h-4" />
+                  Chat
                 </Button>
+                
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-11 w-11"
+                  onClick={() => handleDownload(note._id, note.fileName, note.fileType)}
+                  disabled={downloadingId === note._id}
+                  title="Download"
+                >
+                  {downloadingId === note._id ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                  ) : (
+                    <Download className="w-4 h-4" />
+                  )}
+                </Button>
+                
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      variant="outline"
+                      size="icon"
+                      className="h-11 w-11 hover:bg-destructive/10 hover:text-destructive hover:border-destructive"
                       disabled={deletingId === note._id}
+                      title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -210,7 +286,7 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete Note</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Are you sure you want to delete "{note.name}"? This action cannot be undone.
+                        Are you sure you want to delete <strong>"{note.name}"</strong>? This action cannot be undone and the file will be permanently removed.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -225,10 +301,10 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
                   </AlertDialogContent>
                 </AlertDialog>
               </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
   )
 }
