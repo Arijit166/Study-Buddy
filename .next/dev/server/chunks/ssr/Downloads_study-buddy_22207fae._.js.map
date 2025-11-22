@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/User/Downloads/study-buddy/lib/utils.ts"],"sourcesContent":["import { clsx, type ClassValue } from 'clsx'\r\nimport { twMerge } from 'tailwind-merge'\r\n\r\nexport function cn(...inputs: ClassValue[]) {\r\n  return twMerge(clsx(inputs))\r\n}\r\n"],"names":[],"mappings":";;;;AAAA;AACA;;;AAEO,SAAS,GAAG,GAAG,MAAoB;IACxC,OAAO,IAAA,qMAAO,EAAC,IAAA,4KAAI,EAAC;AACtB"}},
-    {"offset": {"line": 19, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/User/Downloads/study-buddy/components/ui/label.tsx"],"sourcesContent":["'use client'\r\n\r\nimport * as React from 'react'\r\nimport * as LabelPrimitive from '@radix-ui/react-label'\r\n\r\nimport { cn } from '@/lib/utils'\r\n\r\nfunction Label({\r\n  className,\r\n  ...props\r\n}: React.ComponentProps<typeof LabelPrimitive.Root>) {\r\n  return (\r\n    <LabelPrimitive.Root\r\n      data-slot=\"label\"\r\n      className={cn(\r\n        'flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50',\r\n        className,\r\n      )}\r\n      {...props}\r\n    />\r\n  )\r\n}\r\n\r\nexport { Label }\r\n"],"names":[],"mappings":";;;;;AAGA;AAEA;AALA;;;;AAOA,SAAS,MAAM,EACb,SAAS,EACT,GAAG,OAC8C;IACjD,qBACE,6QAAC,wMAAmB;QAClB,aAAU;QACV,WAAW,IAAA,iJAAE,EACX,uNACA;QAED,GAAG,KAAK;;;;;;AAGf"}}]
-}
