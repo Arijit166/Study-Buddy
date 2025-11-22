@@ -68,15 +68,18 @@ export async function GET(request: NextRequest) {
     else if (!user && !isSignupFlow) {
       return NextResponse.redirect(new URL('/?error=user_not_found', request.url));
     }
+    else if (user && isSignupFlow) {
+      return NextResponse.redirect(new URL('/signup?error=account_exists', request.url));
+    }
     // If user exists, update Google ID and avatar if needed
-    else if (user) {
-      if (!user.googleId) {
-        user.googleId = googleUser.id;
-      }
-      if (!user.avatar) {
-        user.avatar = googleUser.picture;
-      }
-      await user.save();
+    else if (user && !isSignupFlow) {
+        if (!user.googleId) {
+            user.googleId = googleUser.id;
+        }
+        if (!user.avatar) {
+            user.avatar = googleUser.picture;
+        }
+        await user.save();
     }
     
     // Create session

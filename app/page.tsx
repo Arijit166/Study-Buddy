@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+// Remove this: import { signIn } from 'next-auth/react';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,17 +35,32 @@ export default function LoginPage() {
     setError("");
 
     const formData = new FormData(e.target as HTMLFormElement);
-    const result = await signIn("credentials", {
-      email: formData.get("email"),
-      password: formData.get("password"),
-      redirect: false,
-    });
+    
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.get("email"),
+          password: formData.get("password"),
+        }),
+      });
 
-    if (result?.error) {
-      setError(result.error);
-      setIsLoading(false);
-    } else {
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setError(data.message || "Login failed");
+        setIsLoading(false);
+        return;
+      }
+
+      // Success - redirect to dashboard
       router.push("/dashboard");
+      router.refresh();
+      
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+      setIsLoading(false);
     }
   };
 

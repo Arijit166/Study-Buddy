@@ -7,19 +7,38 @@ import { ProfileHeader } from "@/components/profile-header"
 import { StudyStatsDetailed } from "@/components/study-stats-detailed"
 import { SettingsSection } from "@/components/settings-section"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useUser } from "@/hooks/use-user"
 
 export default function ProfilePage() {
+  const { user, loading } = useUser();
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <TopNavbar title="Profile" />
+        <TopNavbar 
+          title="Profile"
+          userName={user?.name}
+          userAvatar={user?.avatar}
+        />
 
         <main className="flex-1 overflow-auto">
           <div className="p-8 space-y-8">
             {/* Profile Header */}
-            <ProfileHeader />
+            <ProfileHeader 
+              userName={user?.name}
+              userEmail={user?.email}
+              userAvatar={user?.avatar}
+            />
 
             {/* Tabs */}
             <Tabs defaultValue="statistics" className="space-y-6">

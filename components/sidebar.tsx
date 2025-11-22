@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation"
 import { LayoutDashboard, BookOpen, MessageSquare, Lightbulb, BarChart3, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { signOut } from "next-auth/react"
 import { useState } from "react"
 
 const navItems = [
@@ -24,8 +23,21 @@ export function Sidebar() {
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
-    await signOut({ redirect: false })
-    router.push("/")
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+      
+      if (response.ok) {
+        // Redirect to login page
+        router.push('/')
+        router.refresh() // Force a refresh to clear any cached data
+      }
+    } catch (error) {
+      console.error('Logout failed:', error)
+    } finally {
+      setIsLoggingOut(false)
+    }
   }
 
   return (
