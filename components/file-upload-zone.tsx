@@ -1,23 +1,32 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Upload, File, X } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Upload, X } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { toast } from "sonner"
 
-interface UploadedFile {
+interface PendingFile {
+  file: File
   id: string
-  name: string
-  size: number
-  type: string
-  progress: number
 }
 
-export function FileUploadZone() {
-  const [files, setFiles] = useState<UploadedFile[]>([])
+export function FileUploadZone({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
   const [dragActive, setDragActive] = useState(false)
+  const [showNameDialog, setShowNameDialog] = useState(false)
+  const [pendingFile, setPendingFile] = useState<PendingFile | null>(null)
+  const [noteName, setNoteName] = useState("")
+  const [uploading, setUploading] = useState(false)
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -35,51 +44,81 @@ export function FileUploadZone() {
     setDragActive(false)
 
     const droppedFiles = e.dataTransfer.files
-    if (droppedFiles) {
-      handleFiles(droppedFiles)
+    if (droppedFiles && droppedFiles[0]) {
+      handleFileSelect(droppedFiles[0])
     }
   }
 
-  const handleFiles = (fileList: FileList) => {
-    const newFiles = Array.from(fileList).map((file) => ({
-      id: Math.random().toString(36).substr(2, 9),
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      progress: 0,
-    }))
+  const handleFileSelect = (file: File) => {
+    // Validate file type
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg']
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Invalid file type. Only PDF and images (PNG, JPG) are allowed')
+      return
+    }
 
-    setFiles([...files, ...newFiles])
+    // Validate file size (max 50MB)
+    const maxSize = 50 * 1024 * 1024
+    if (file.size > maxSize) {
+      toast.error('File size exceeds 50MB limit')
+      return
+    }
 
-    // Simulate upload progress
-    newFiles.forEach((file) => {
-      let progress = 0
-      const interval = setInterval(() => {
-        progress += Math.random() * 30
-        if (progress >= 100) {
-          progress = 100
-          clearInterval(interval)
-        }
-        setFiles((prev) => prev.map((f) => (f.id === file.id ? { ...f, progress } : f)))
-      }, 200)
+    setPendingFile({
+      file,
+      id: Math.random().toString(36).substr(2, 9)
     })
+    setNoteName("")
+    setShowNameDialog(true)
   }
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes"
-    const k = 1024
-    const sizes = ["Bytes", "KB", "MB", "GB"]
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i]
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleFileSelect(file)
+    }
+    e.target.value = ''
   }
 
-  const removeFile = (id: string) => {
-    setFiles(files.filter((f) => f.id !== id))
+  const handleUpload = async () => {
+    if (!pendingFile || !noteName.trim()) {
+      toast.error('Please enter a name for your note')
+      return
+    }
+
+    setUploading(true)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', pendingFile.file)
+      formData.append('name', noteName.trim())
+
+      const response = await fetch('/api/notes/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast.success('File uploaded successfully!')
+        setShowNameDialog(false)
+        setPendingFile(null)
+        setNoteName("")
+        onUploadSuccess?.()
+      } else {
+        toast.error(data.error || 'Failed to upload file')
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      toast.error('Failed to upload file')
+    } finally {
+      setUploading(false)
+    }
   }
 
   return (
-    <div className="space-y-6">
-      {/* Upload Zone */}
+    <>
       <Card
         className={`border-2 border-dashed cursor-pointer transition-all duration-200 ${
           dragActive
@@ -100,61 +139,75 @@ export function FileUploadZone() {
               <h3 className="text-xl font-semibold text-foreground">Upload Study Materials</h3>
               <p className="text-sm text-muted-foreground mt-1">Drag and drop your files or click to browse</p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-              <Button className="gap-2 rounded-lg h-11 bg-primary hover:bg-primary/90">
-                <Upload className="w-4 h-4" />
-                Choose Files
-              </Button>
-              <Button variant="outline" className="gap-2 rounded-lg h-11 bg-transparent">
-                Browse Folder
-              </Button>
+            <div className="flex justify-center pt-2">
+              <label htmlFor="file-upload">
+                <Button className="gap-2 rounded-lg h-11 bg-primary hover:bg-primary/90" asChild>
+                  <span>
+                    <Upload className="w-4 h-4" />
+                    Browse Files
+                  </span>
+                </Button>
+              </label>
+              <input
+                id="file-upload"
+                type="file"
+                className="hidden"
+                accept=".pdf,.png,.jpg,.jpeg"
+                onChange={handleFileInputChange}
+              />
             </div>
             <p className="text-xs text-muted-foreground pt-2">
-              Supported formats: PDF, DOCX, PNG, JPG (Max 50MB per file)
+              Supported formats: PDF, PNG, JPG (Max 50MB per file)
             </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* Uploads List */}
-      {files.length > 0 && (
-        <Card className="border-0 shadow-md">
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-foreground mb-4">Uploading Files</h3>
-            <div className="space-y-3">
-              {files.map((file) => (
-                <div key={file.id} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
-                        <File className="w-4 h-4 text-primary" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
-                        <p className="text-xs text-muted-foreground">{formatFileSize(file.size)}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => removeFile(file.id)}
-                      className="p-2 hover:bg-muted rounded-lg transition-colors flex-shrink-0"
-                    >
-                      <X className="w-4 h-4 text-muted-foreground hover:text-foreground" />
-                    </button>
-                  </div>
-                  {/* Progress Bar */}
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
-                      style={{ width: `${file.progress}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-xs text-muted-foreground text-right">{Math.round(file.progress)}%</p>
-                </div>
-              ))}
+      {/* Name Dialog */}
+      <Dialog open={showNameDialog} onOpenChange={setShowNameDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Name Your Note</DialogTitle>
+            <DialogDescription>
+              Give your uploaded file a memorable name to easily find it later.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="note-name">Note Name</Label>
+              <Input
+                id="note-name"
+                placeholder="e.g., Chapter 5 Summary"
+                value={noteName}
+                onChange={(e) => setNoteName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleUpload()}
+              />
             </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+            {pendingFile && (
+              <div className="text-sm text-muted-foreground">
+                <p><strong>File:</strong> {pendingFile.file.name}</p>
+                <p><strong>Size:</strong> {(pendingFile.file.size / 1024 / 1024).toFixed(2)} MB</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowNameDialog(false)
+                setPendingFile(null)
+                setNoteName("")
+              }}
+              disabled={uploading}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleUpload} disabled={uploading || !noteName.trim()}>
+              {uploading ? 'Uploading...' : 'Upload'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
