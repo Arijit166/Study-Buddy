@@ -417,7 +417,8 @@ function LoginPage() {
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$study$2d$buddy$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$study$2d$buddy$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
                                                     name: "email",
                                                     type: "email",
-                                                    required: true
+                                                    required: true,
+                                                    className: "mt-2"
                                                 }, void 0, false, {
                                                     fileName: "[project]/Downloads/study-buddy/app/page.tsx",
                                                     lineNumber: 72,
@@ -441,7 +442,8 @@ function LoginPage() {
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$study$2d$buddy$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$study$2d$buddy$2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
                                                     name: "password",
                                                     type: "password",
-                                                    required: true
+                                                    required: true,
+                                                    className: "mt-2"
                                                 }, void 0, false, {
                                                     fileName: "[project]/Downloads/study-buddy/app/page.tsx",
                                                     lineNumber: 77,
@@ -511,7 +513,7 @@ function LoginPage() {
                                     type: "button",
                                     onClick: handleGoogleSignIn,
                                     variant: "outline",
-                                    className: "w-full h-11 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors bg-transparent",
+                                    className: "w-full h-11 rounded-lg border-2 border-border hover:bg-accent/100 transition-colors bg-transparent",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$study$2d$buddy$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
                                             className: "w-5 h-5 mr-2",

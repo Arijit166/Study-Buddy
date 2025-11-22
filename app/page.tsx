@@ -69,12 +69,12 @@ export default function LoginPage() {
 
               <div>
                 <Label>Email</Label>
-                <Input name="email" type="email" required />
+                <Input name="email" type="email" required className="mt-2"/>
               </div>
 
               <div>
                 <Label>Password</Label>
-                <Input name="password" type="password" required />
+                <Input name="password" type="password" required className="mt-2"/>
               </div>
 
               <Button type="submit" disabled={isLoading} className="w-full h-11 rounded-lg">
@@ -97,7 +97,7 @@ export default function LoginPage() {
               type="button"
               onClick={handleGoogleSignIn}
               variant="outline"
-              className="w-full h-11 rounded-lg border-2 border-border hover:bg-muted/50 transition-colors bg-transparent"
+              className="w-full h-11 rounded-lg border-2 border-border hover:bg-accent/100 transition-colors bg-transparent"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path

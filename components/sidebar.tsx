@@ -1,10 +1,12 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { LayoutDashboard, BookOpen, MessageSquare, Lightbulb, BarChart3, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { signOut } from "next-auth/react"
+import { useState } from "react"
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
@@ -17,6 +19,14 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    await signOut({ redirect: false })
+    router.push("/")
+  }
 
   return (
     <aside className="w-64 h-screen bg-sidebar border-r border-sidebar-border flex flex-col">
@@ -59,9 +69,14 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="px-3 py-4 border-t border-sidebar-border">
-        <Button variant="outline" className="w-full justify-start gap-3 h-10 rounded-lg bg-transparent">
+        <Button 
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          variant="outline" 
+          className="w-full justify-start gap-3 h-10 rounded-lg bg-transparent hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+        >
           <LogOut className="w-4 h-4" />
-          <span>Logout</span>
+          <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
         </Button>
       </div>
     </aside>

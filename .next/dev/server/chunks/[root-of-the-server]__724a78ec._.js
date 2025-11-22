@@ -160,56 +160,52 @@ var __TURBOPACK__imported__module__$5b$externals$5d2f$mongoose__$5b$external$5d$
 var __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$study$2d$buddy$2f$node_modules$2f$bcryptjs$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Downloads/study-buddy/node_modules/bcryptjs/index.js [app-route] (ecmascript)");
 ;
 ;
-const UserSchema = new __TURBOPACK__imported__module__$5b$externals$5d2f$mongoose__$5b$external$5d$__$28$mongoose$2c$__cjs$29$__["default"].Schema({
-    firstName: {
-        type: String,
-        required: function() {
-            return !this.googleId;
+let User;
+if (__TURBOPACK__imported__module__$5b$externals$5d2f$mongoose__$5b$external$5d$__$28$mongoose$2c$__cjs$29$__["default"].models.User) {
+    User = __TURBOPACK__imported__module__$5b$externals$5d2f$mongoose__$5b$external$5d$__$28$mongoose$2c$__cjs$29$__["default"].models.User;
+} else {
+    const UserSchema = new __TURBOPACK__imported__module__$5b$externals$5d2f$mongoose__$5b$external$5d$__$28$mongoose$2c$__cjs$29$__["default"].Schema({
+        firstName: {
+            type: String,
+            required: function() {
+                return !this.googleId;
+            }
+        },
+        lastName: {
+            type: String,
+            required: function() {
+                return !this.googleId;
+            }
+        },
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            lowercase: true
+        },
+        password: {
+            type: String,
+            required: function() {
+                return !this.googleId;
+            }
+        },
+        googleId: {
+            type: String,
+            sparse: true,
+            unique: true
+        },
+        avatar: String,
+        createdAt: {
+            type: Date,
+            default: Date.now
         }
-    },
-    lastName: {
-        type: String,
-        required: function() {
-            return !this.googleId;
-        }
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true
-    },
-    password: {
-        type: String,
-        required: function() {
-            return !this.googleId;
-        }
-    },
-    googleId: {
-        type: String,
-        sparse: true,
-        unique: true
-    },
-    avatar: String,
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
-UserSchema.pre('save', async function(next) {
-    if (!this.isModified('password') || !this.password) return next();
-    try {
-        const salt = await __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$study$2d$buddy$2f$node_modules$2f$bcryptjs$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].genSalt(10);
-        this.password = await __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$study$2d$buddy$2f$node_modules$2f$bcryptjs$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].hash(this.password, salt);
-        next();
-    } catch (error) {
-        next(error);
-    }
-});
-UserSchema.methods.comparePassword = async function(candidatePassword) {
-    return await __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$study$2d$buddy$2f$node_modules$2f$bcryptjs$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].compare(candidatePassword, this.password);
-};
-const __TURBOPACK__default__export__ = __TURBOPACK__imported__module__$5b$externals$5d2f$mongoose__$5b$external$5d$__$28$mongoose$2c$__cjs$29$__["default"].models.User || __TURBOPACK__imported__module__$5b$externals$5d2f$mongoose__$5b$external$5d$__$28$mongoose$2c$__cjs$29$__["default"].model('User', UserSchema);
+    });
+    UserSchema.methods.comparePassword = async function(candidatePassword) {
+        return await __TURBOPACK__imported__module__$5b$project$5d2f$Downloads$2f$study$2d$buddy$2f$node_modules$2f$bcryptjs$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].compare(candidatePassword, this.password);
+    };
+    User = __TURBOPACK__imported__module__$5b$externals$5d2f$mongoose__$5b$external$5d$__$28$mongoose$2c$__cjs$29$__["default"].model('User', UserSchema);
+}
+const __TURBOPACK__default__export__ = User;
 }),
 "[project]/Downloads/study-buddy/app/api/auth/[...nextauth]/route.js [app-route] (ecmascript)", ((__turbopack_context__) => {
 "use strict";

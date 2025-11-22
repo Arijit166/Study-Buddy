@@ -1,159 +1,26 @@
-[00:00:01.753] Server  LOG      ✓ Ready in 1184ms
-[00:00:08.876] Server  LOG      ○ Compiling / ...
-[00:00:12.272] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:12.468] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:00:12.468] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:00:12.468] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763753886757}
-[00:07:32.162] Server  LOG      ✓ Compiled in 332ms
-[00:12:20.346] Server  LOG      ✓ Compiled in 215ms
-[00:12:21.058] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:12:23.455] Server  ERROR   C:\Users\User\Downloads\study-buddy\.next\dev\server\chunks\[root-of-the-server]__724a78ec._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:23.459] Server  ERROR   C:\Users\User\Downloads\study-buddy\.next\dev\server\chunks\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:23.495] Server  ERROR   C:\Users\User\Downloads\study-buddy\.next\dev\server\chunks\76835_next_d3a10b68._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:23.521] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\require-hook.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:23.523] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\require.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:23.526] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\load-components.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:23.533] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:23.536] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\lib\trace\tracer.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:23.543] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:23.553] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:23.555] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:23.558] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:23.561] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:23.566] Server  ERROR    ⨯ Error: Please define the MONGODB_URI environment variable
-[00:12:23.579] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-%s%s https://react.dev/link/hydration-mismatch 
-
-  ...
-    <RedirectBoundary>
-      <RedirectErrorBoundary router={{...}}>
-        <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{lazyData:null, ...}} segmentPath={[...]} ...>
-          <SegmentViewNode type="page" pagePath="/Downloads...">
-            <SegmentTrieNode>
-            <ClientPageRoot Component={function LoginPage} serverProvidedParams={{...}}>
-              <LoginPage params={Promise} searchParams={Promise}>
-                <div className="min-h-scre...">
-                  <div className="w-full max...">
-                    <div>
-                    <Card className="border-0 s...">
-                      <div data-slot="card" className="bg-card te...">
-                        <CardHeader>
-                        <CardContent>
-                          <div data-slot="card-content" className="px-6">
-                            <form className="space-y-4" onSubmit={function handleSubmit}>
-                              <div>
-                                <Label>
-                                <Input name="email" type="email" required={true}>
-                                  <input
-                                    type="email"
-                                    data-slot="input"
-                                    className="file:text-foreground placeholder:text-muted-foreground selection:bg-pri..."
-                                    name="email"
-                                    required={true}
--                                   fdprocessedid="td0wi2r"
-                                  >
-                              <div>
-                                <Label>
-                                <Input name="password" type="password" required={true}>
-                                  <input
-                                    type="password"
-                                    data-slot="input"
-                                    className="file:text-foreground placeholder:text-muted-foreground selection:bg-pri..."
-                                    name="password"
-                                    required={true}
--                                   fdprocessedid="q8rmti"
-                                  >
-                              <Button type="submit" disabled={false} className="w-full h-1...">
-                                <button
-                                  data-slot="button"
-                                  className={"inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm..."}
-                                  type="submit"
-                                  disabled={false}
--                                 fdprocessedid="tsszf8"
-                                >
-+                                 Continue
-                            <div>
-                            <Button type="button" onClick={function handleGoogleSignIn} variant="outline" ...>
-                              <button
-                                data-slot="button"
-                                className={"inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm f..."}
-                                type="button"
-                                onClick={function handleGoogleSignIn}
--                               fdprocessedid="yh3wb5"
-                              >
-                            ...
-                    ...
-          ...
-        ...
-
-[00:12:23.579] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:12:23.579] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:12:23.579] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763754615879}
-[00:12:26.224] Server  ERROR   C:\Users\User\Downloads\study-buddy\.next\dev\server\chunks\[root-of-the-server]__724a78ec._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:26.226] Server  ERROR   C:\Users\User\Downloads\study-buddy\.next\dev\server\chunks\[turbopack]_runtime.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:26.228] Server  ERROR   C:\Users\User\Downloads\study-buddy\.next\dev\server\chunks\76835_next_d3a10b68._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:26.232] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\require-hook.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:26.235] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\require.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:26.236] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\load-components.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:26.238] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:26.239] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\lib\trace\tracer.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:26.242] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:26.244] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:26.246] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:26.249] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:26.253] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:12:26.255] Server  ERROR    ⨯ Error: Please define the MONGODB_URI environment variable
-[00:12:26.375] Browser ERROR   [next-auth][error][CLIENT_FETCH_ERROR] 
-https://next-auth.js.org/errors#client_fetch_error Unexpected token '<', "<!DOCTYPE "... is not valid JSON {"error":{"message":"Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON","name":"SyntaxError","stack":"SyntaxError: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON"},"message":"Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON","url":"/api/auth/session"}
-[00:13:52.105] Server  LOG      ✓ Compiled in 127ms
-[00:29:02.760] Server  LOG        Reload env: .env.local
-[00:30:01.754] Server  LOG        Reload env: .env.local
-[00:30:16.905] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:30:18.102] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:30:18.102] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:30:18.102] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763755691379}
-[00:30:34.418] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/signup color: rgb(120, 120, 120) color: inherit {"dp":"/signup","o":"http://localhost:3000/signup","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763755708712}
-[00:30:39.586] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763755713882}
-[00:31:23.956] Server  LOG      ✓ Compiled in 245ms
-[00:31:28.914] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:31:29.813] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:31:29.813] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:31:29.813] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763755763351}
-[00:31:33.078] Server  LOG      ✓ Compiled in 203ms
-[00:31:42.790] Server  LOG      ✓ Compiled in 100ms
-[00:32:00.751] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/signup color: rgb(120, 120, 120) color: inherit {"dp":"/signup","o":"http://localhost:3000/signup","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763755795042}
-[00:32:21.648] Server  ERROR   C:\Users\User\Downloads\study-buddy\.next\dev\server\chunks\[root-of-the-server]__724a78ec._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:21.652] Server  ERROR   C:\Users\User\Downloads\study-buddy\.next\dev\server\chunks\[root-of-the-server]__28a1785b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:21.697] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:21.716] Server  ERROR   C:\Users\User\Downloads\study-buddy\.next\dev\server\chunks\76835_ab5530ef._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:21.719] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:21.721] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:21.722] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:21.724] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:21.725] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:21.727] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:21.732] Server  ERROR   Signup error: TypeError: next is not a function
-[00:32:31.402] Server  ERROR   C:\Users\User\Downloads\study-buddy\.next\dev\server\chunks\[root-of-the-server]__724a78ec._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:31.404] Server  ERROR   C:\Users\User\Downloads\study-buddy\.next\dev\server\chunks\[root-of-the-server]__28a1785b._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:31.406] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:31.407] Server  ERROR   C:\Users\User\Downloads\study-buddy\.next\dev\server\chunks\76835_ab5530ef._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:31.409] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\base-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:31.410] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\next-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:31.412] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\dev\next-dev-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:31.414] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\trace\trace.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:31.415] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\lib\router-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:31.417] Server  ERROR   C:\Users\User\Downloads\study-buddy\node_modules\next\dist\server\lib\start-server.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
-[00:32:31.419] Server  ERROR   Signup error: TypeError: next is not a function
-[00:32:45.981] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:32:46.201] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
-[00:32:46.201] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
-[00:32:46.201] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/?error=next%20is%20not%20a%20function color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/?error=next%20is%20not%20a%20function","r":"https://accounts.google.com/","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763755840495}
+[00:00:01.713] Server  LOG      ✓ Ready in 1053ms
+[00:00:04.857] Server  LOG      ○ Compiling /signup ...
+[00:00:07.326] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:07.538] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:07.538] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/signup","route":"/signup"}
+[00:00:07.538] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/signup color: rgb(120, 120, 120) color: inherit {"dp":"/signup","o":"http://localhost:3000/signup","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763791601617}
+[00:00:26.823] Server  LOG      ○ Compiling /dashboard ...
+[00:00:28.033] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763791622048}
+[00:00:43.541] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:43.905] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:43.905] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/","route":"/"}
+[00:00:43.905] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","r":"","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763791637764}
+[00:00:48.741] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:49.127] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:00:49.127] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:00:49.127] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763791643199}
+[00:05:43.078] Server  LOG      ✓ Compiled in 284ms
+[00:05:49.814] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:50.162] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:05:50.162] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:05:50.162] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763791944214}
+[00:05:52.085] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763791946125}
+[00:05:58.966] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:05:59.367] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[00:05:59.367] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/dashboard","route":"/dashboard"}
+[00:05:59.367] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/dashboard","o":"http://localhost:3000/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763791953301}

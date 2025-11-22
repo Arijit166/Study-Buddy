@@ -19,13 +19,29 @@ export default function SignupPage() {
     setIsLoading(true);
     setError("");
 
-    const formData = new FormData(e.target as HTMLFormElement);
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
     const data = {
-      firstName: formData.get("first-name"),
-      lastName: formData.get("last-name"),
-      email: formData.get("email"),
-      password: formData.get("password"),
+      firstName: formData.get("first-name") as string,
+      lastName: formData.get("last-name") as string,
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
     };
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email)) {
+      setIsLoading(false);
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    const passRegex = /^(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    if (!passRegex.test(data.password)) {
+      setIsLoading(false);
+      setError("Password must be at least 8 characters long and include at least one special character.");
+      return;
+    }
 
     try {
       const response = await fetch("/api/auth/signup", {

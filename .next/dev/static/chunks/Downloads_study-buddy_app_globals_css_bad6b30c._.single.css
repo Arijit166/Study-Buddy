@@ -1517,18 +1517,6 @@
     margin-block-end: calc(calc(var(--spacing) * 8) * calc(1 - var(--tw-space-y-reverse)));
   }
 
-  :where(.space-y-10 > :not(:last-child)) {
-    --tw-space-y-reverse: 0;
-    margin-block-start: calc(calc(var(--spacing) * 10) * var(--tw-space-y-reverse));
-    margin-block-end: calc(calc(var(--spacing) * 10) * calc(1 - var(--tw-space-y-reverse)));
-  }
-
-  :where(.space-y-1000 > :not(:last-child)) {
-    --tw-space-y-reverse: 0;
-    margin-block-start: calc(calc(var(--spacing) * 1000) * var(--tw-space-y-reverse));
-    margin-block-end: calc(calc(var(--spacing) * 1000) * calc(1 - var(--tw-space-y-reverse)));
-  }
-
   :where(.space-x-3 > :not(:last-child)) {
     --tw-space-x-reverse: 0;
     margin-inline-start: calc(calc(var(--spacing) * 3) * var(--tw-space-x-reverse));
@@ -3138,6 +3126,12 @@
   }
 
   @media (hover: hover) {
+    .hover\:border-red-200:hover {
+      border-color: var(--color-red-200);
+    }
+  }
+
+  @media (hover: hover) {
     .hover\:bg-accent:hover {
       background-color: var(--accent);
     }
@@ -3152,6 +3146,12 @@
       .hover\:bg-accent\/90:hover {
         background-color: color-mix(in oklab, var(--accent) 90%, transparent);
       }
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:bg-accent\/100:hover {
+      background-color: var(--accent);
     }
   }
 
@@ -3314,6 +3314,12 @@
   @media (hover: hover) {
     .hover\:text-muted-foreground:hover {
       color: var(--muted-foreground);
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:text-red-600:hover {
+      color: var(--color-red-600);
     }
   }
 
