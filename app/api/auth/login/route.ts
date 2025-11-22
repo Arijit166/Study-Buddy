@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
       email: user.email,
       name: `${user.firstName} ${user.lastName}`,
       avatar: user.avatar || null,
+      createdAt:user.createdAt,
     };
     
     const response = NextResponse.json(

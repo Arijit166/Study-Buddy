@@ -12,10 +12,15 @@ export async function GET(request: NextRequest) {
 
     const sessionData = JSON.parse(userSession.value);
     
-    // Ensure the session data has the name field
+    // Ensure the session data has all required fields
     const user = {
-      ...sessionData,
+      userId: sessionData.userId,
+      firstName: sessionData.firstName,
+      lastName: sessionData.lastName,
       name: sessionData.name || `${sessionData.firstName} ${sessionData.lastName}`.trim(),
+      email: sessionData.email,
+      avatar: sessionData.avatar,
+      createdAt: sessionData.createdAt, // Add this
     };
 
     return NextResponse.json({ user }, { status: 200 });

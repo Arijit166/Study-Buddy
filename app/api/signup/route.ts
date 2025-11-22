@@ -29,19 +29,35 @@ export async function POST(req: NextRequest) {
       password: hashedPassword,
     });
 
-    return NextResponse.json(
+    // Create session data
+    const sessionData = {
+      userId: user._id.toString(),
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      name: `${user.firstName} ${user.lastName}`,
+      avatar: user.avatar || undefined,
+      createdAt: user.createdAt,
+    };
+
+    const response = NextResponse.json(
       {
         message: "Account created successfully",
-        user: {
-          id: user._id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          avatar: user.avatar || null,
-        },
+        user: sessionData,
       },
       { status: 201 }
     );
+
+    // Set session cookie
+    response.cookies.set('user_session', JSON.stringify(sessionData), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/'
+    });
+
+    return response;
   } catch (error) {
     const message = error instanceof Error ? error.message : "Signup failed";
     return NextResponse.json(

@@ -13,42 +13,27 @@ export async function PATCH(request: NextRequest) {
     }
 
     const sessionData = JSON.parse(userSession.value);
-    const { name, avatar } = await request.json();
+    const { firstName, lastName, avatar } = await request.json();
 
     await connectDB();
 
-    const nameParts = name?.trim().split(' ') || [];
-    const firstName = nameParts[0] || sessionData.name?.split(' ')[0];
-    const lastName = nameParts.slice(1).join(' ') || sessionData.name?.split(' ').slice(1).join(' ') || '';
-
-    const updateFields: any = {
-      firstName,
-      lastName,
+    const updateData: any = {
+      firstName: firstName || sessionData.firstName,
+      lastName: lastName || sessionData.lastName || '',
     };
 
-    let updatedUser;
+    // Handle avatar: null means remove, undefined means don't change, string means update
     if (avatar === null) {
-    updatedUser = await User.findByIdAndUpdate(
-        sessionData.userId,
-        {
-        firstName,
-        lastName,
-        $unset: { avatar: "" }
-        },
-        { new: true, runValidators: true }
-    ).select('-password');
-    } else {
-    // Add or update avatar (including when avatar is a string)
-    updatedUser = await User.findByIdAndUpdate(
-        sessionData.userId,
-        {
-        firstName,
-        lastName,
-        ...(avatar && { avatar })
-        },
-        { new: true, runValidators: true }
-    ).select('-password');
+      updateData.$unset = { avatar: "" };
+    } else if (avatar !== undefined) {
+      updateData.avatar = avatar;
     }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      sessionData.userId,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('-password');
 
     if (!updatedUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -64,17 +49,20 @@ export async function PATCH(request: NextRequest) {
       createdAt: updatedUser.createdAt,
     };
 
-    cookieStore.set('user_session', JSON.stringify(updatedSession), {
+    const response = NextResponse.json({ 
+      user: updatedSession,
+      message: 'Profile updated successfully' 
+    }, { status: 200 });
+
+    response.cookies.set('user_session', JSON.stringify(updatedSession), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7,
+      path: '/'
     });
 
-    return NextResponse.json({ 
-      user: updatedSession,
-      message: 'Profile updated successfully' 
-    }, { status: 200 });
+    return response;
 
   } catch (error) {
     console.error('Profile update error:', error);

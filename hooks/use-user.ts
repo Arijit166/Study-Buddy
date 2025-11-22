@@ -32,13 +32,17 @@ export function useUser() {
 
   const updateUser = async (name: string, avatar: string | null) => {
     try {
+      const nameParts = name.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      
       console.log('Calling API:', '/api/user/profile');
-      console.log('Payload:', { name, avatar });
+      console.log('Payload:', { firstName, lastName, avatar });
       
       const response = await fetch('/api/user/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, avatar }),
+        body: JSON.stringify({ firstName, lastName, avatar }),
       });
 
       console.log('Response status:', response.status);

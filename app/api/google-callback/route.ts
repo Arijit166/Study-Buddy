@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import User from '@/models/User';
+import { create } from 'domain';
 
 export async function GET(request: NextRequest) {
   try {
@@ -88,6 +89,7 @@ export async function GET(request: NextRequest) {
         email: user!.email,
         name: `${user!.firstName} ${user!.lastName}`,
         avatar: user!.avatar,
+        createdAt:user!.createdAt,
         };
 
         // Use absolute URL for redirect

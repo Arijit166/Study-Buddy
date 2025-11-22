@@ -34,8 +34,9 @@ export function ProfileHeader({
   }
 
   const getMemberSince = () => {
-    if (!createdAt) return "";
-    const date = new Date(createdAt);
+    if (!createdAt) return "Recently";
+    const date = typeof createdAt === 'string' ? new Date(createdAt) : createdAt;
+    if (isNaN(date.getTime())) return "Recently";
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   };
 
@@ -46,23 +47,34 @@ export function ProfileHeader({
     }
   };
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const newAvatar = reader.result as string;
-        setCurrentAvatar(newAvatar);
-        onUpdateProfile?.(editedName, newAvatar);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          const { url } = await response.json();
+          setCurrentAvatar(url);
+          onUpdateProfile?.(userName || "", url);
+        }
+      } catch (error) {
+        console.error('Avatar upload failed:', error);
+      }
     }
     e.target.value = '';
   };
 
   const handleRemoveAvatar = () => {
     setCurrentAvatar(undefined);
-    onUpdateProfile?.(editedName, null);
+    // Use userName consistently
+    onUpdateProfile?.(userName || "", null);
   };
 
   return (
@@ -149,15 +161,13 @@ export function ProfileHeader({
               </p>
             )}
             <div className="flex items-center gap-4 mt-4 text-sm">
-              {createdAt && (
-                <div>
-                  <p className="text-muted-foreground">Member since</p>
-                  <p className="font-semibold text-foreground flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    {getMemberSince()}
-                  </p>
-                </div>
-              )}
+              <div>
+                <p className="text-muted-foreground">Member since</p>
+                <p className="font-semibold text-foreground flex items-center gap-1">
+                  <Calendar className="w-4 h-4" />
+                  {getMemberSince() || "Recently"}
+                </p>
+              </div>
               <div>
                 <p className="text-muted-foreground">Study streak</p>
                 <p className="font-semibold text-foreground">7 days</p>
