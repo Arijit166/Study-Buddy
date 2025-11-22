@@ -10,7 +10,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ user: null }, { status: 401 });
     }
 
-    const user = JSON.parse(userSession.value);
+    const sessionData = JSON.parse(userSession.value);
+    
+    // Ensure the session data has the name field
+    const user = {
+      ...sessionData,
+      name: sessionData.name || `${sessionData.firstName} ${sessionData.lastName}`.trim(),
+    };
+
     return NextResponse.json({ user }, { status: 200 });
   } catch (error) {
     console.error('Session error:', error);

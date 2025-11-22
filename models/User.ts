@@ -47,7 +47,10 @@ if (mongoose.models.User) {
       sparse: true,
       unique: true,
     },
-    avatar: String,
+    avatar: {
+      type: String,
+      default: undefined,
+    },
     createdAt: {
       type: Date,
       default: Date.now,

@@ -8,9 +8,21 @@ import { StudyStatsDetailed } from "@/components/study-stats-detailed"
 import { SettingsSection } from "@/components/settings-section"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useUser } from "@/hooks/use-user"
+import { toast } from "sonner"
 
 export default function ProfilePage() {
-  const { user, loading } = useUser();
+  const { user, loading, updateUser } = useUser();
+
+  // ADD THIS FUNCTION
+  const handleUpdateProfile = async (name: string, avatar: string | null) => {
+    const result = await updateUser(name, avatar);
+    
+    if (result.success) {
+      toast.success('Profile updated successfully');
+    } else {
+      toast.error(result.error || 'Failed to update profile');
+    }
+  };
 
   if (loading) {
     return (
@@ -33,11 +45,13 @@ export default function ProfilePage() {
 
         <main className="flex-1 overflow-auto">
           <div className="p-8 space-y-8">
-            {/* Profile Header */}
+            {/* Profile Header - ADD onUpdateProfile prop */}
             <ProfileHeader 
               userName={user?.name}
               userEmail={user?.email}
               userAvatar={user?.avatar}
+              createdAt={user?.createdAt}
+              onUpdateProfile={handleUpdateProfile}
             />
 
             {/* Tabs */}
@@ -51,11 +65,9 @@ export default function ProfilePage() {
                 </TabsTrigger>
               </TabsList>
 
-              {/* Statistics Tab */}
               <TabsContent value="statistics" className="space-y-6">
                 <StudyStatsDetailed />
 
-                {/* Quick Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   {[
                     { label: "Total Study Hours", value: "44", unit: "hours" },
@@ -74,7 +86,6 @@ export default function ProfilePage() {
                 </div>
               </TabsContent>
 
-              {/* Settings Tab */}
               <TabsContent value="settings">
                 <SettingsSection />
               </TabsContent>
