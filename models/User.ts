@@ -49,7 +49,7 @@ if (mongoose.models.User) {
     },
     avatar: {
       type: String,
-      default: undefined,
+      default: null,
     },
     createdAt: {
       type: Date,

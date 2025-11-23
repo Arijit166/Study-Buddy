@@ -77,9 +77,9 @@ export async function GET(request: NextRequest) {
         if (!user.googleId) {
             user.googleId = googleUser.id;
         }
-        if (!user.avatar) {
-            user.avatar = googleUser.picture;
-        }
+        if (user.avatar === undefined) {
+        user.avatar = googleUser.picture;
+      }
         await user.save();
     }
     

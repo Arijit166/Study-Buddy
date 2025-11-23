@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button"
 import { Mic, Send, Paperclip } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 
-export function ChatInput() {
+export function ChatInput({ onSend, disabled }: { onSend: (message: string) => void, disabled?: boolean }) {
   const [message, setMessage] = useState("")
-
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (message.trim()) {
+    if (message.trim() && !disabled) {
+      onSend(message)
       setMessage("")
     }
   }
@@ -42,6 +43,7 @@ export function ChatInput() {
         <Button
           type="submit"
           size="icon"
+          disabled={disabled}
           className="h-11 w-11 rounded-full bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all duration-200"
         >
           <Send className="w-5 h-5" />

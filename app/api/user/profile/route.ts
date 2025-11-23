@@ -22,9 +22,8 @@ export async function PATCH(request: NextRequest) {
       lastName: lastName || sessionData.lastName || '',
     };
 
-    // Handle avatar: null means remove, undefined means don't change, string means update
     if (avatar === null) {
-      updateData.$unset = { avatar: "" };
+      updateData.avatar = null;
     } else if (avatar !== undefined) {
       updateData.avatar = avatar;
     }

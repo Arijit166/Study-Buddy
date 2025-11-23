@@ -5,12 +5,12 @@ import { usePathname, useRouter } from "next/navigation"
 import { LayoutDashboard, BookOpen, MessageSquare, Lightbulb, BarChart3, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: BookOpen, label: "My Notes", href: "/notes" },
-  { icon: MessageSquare, label: "AI Chat", href: "/chat" },
+  { icon: MessageSquare, label: "AI Chat", href: "/chat", dynamic: true }, // Mark as dynamic
   { icon: Lightbulb, label: "Flashcards", href: "/flashcards" },
   { icon: BarChart3, label: "Quizzes", href: "/quizzes" },
   { icon: User, label: "Profile", href: "/profile" },
@@ -20,6 +20,35 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [lastChatNoteId, setLastChatNoteId] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Fetch last chat session on mount
+    fetch('/api/chat/last')
+      .then(res => res.json())
+      .then(data => {
+        if (data.noteId) {
+          setLastChatNoteId(data.noteId)
+        }
+      })
+      .catch(err => console.error('Failed to fetch last chat:', err))
+  }, [])
+  useEffect(() => {
+    const handleChatUpdate = () => {
+      // Refresh last chat when a message is sent
+      fetch('/api/chat/last')
+        .then(res => res.json())
+        .then(data => {
+          if (data.noteId) {
+            setLastChatNoteId(data.noteId)
+          }
+        })
+        .catch(err => console.error('Failed to fetch last chat:', err))
+    }
+
+    window.addEventListener('chatUpdated', handleChatUpdate)
+    return () => window.removeEventListener('chatUpdated', handleChatUpdate)
+  }, [])
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -29,14 +58,23 @@ export function Sidebar() {
       });
       
       if (response.ok) {
-        // Redirect to login page
         router.push('/')
-        router.refresh() // Force a refresh to clear any cached data
+        router.refresh()
       }
     } catch (error) {
       console.error('Logout failed:', error)
     } finally {
       setIsLoggingOut(false)
+    }
+  }
+
+  const handleNavClick = (item: typeof navItems[0]) => {
+    if (item.label === "AI Chat") {
+      if (lastChatNoteId) {
+        router.push(`/chat/${lastChatNoteId}`)
+      } else {
+        router.push('/notes')
+      }
     }
   }
 
@@ -59,7 +97,29 @@ export function Sidebar() {
       <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const Icon = item.icon
-          const isActive = pathname === item.href
+          const isActive = item.dynamic 
+            ? pathname.startsWith('/chat')
+            : pathname === item.href
+
+          if (item.dynamic) {
+            return (
+              <Button
+                key={item.href}
+                onClick={() => handleNavClick(item)}
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start text-base gap-3 px-4 py-2 h-11 rounded-lg transition-all duration-200",
+                  isActive
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/20 hover:text-sidebar-foreground",
+                )}
+              >
+                <Icon className="w-5 h-5" />
+                {item.label}
+              </Button>
+            )
+          }
+
           return (
             <Link key={item.href} href={item.href}>
               <Button

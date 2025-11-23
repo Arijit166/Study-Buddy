@@ -36,8 +36,6 @@ export async function GET(
         type: note.fileType
       });
     } else if (note.fileType.includes('pdf')) {
-      // For PDFs, generate a simple placeholder for now
-      // In production, you'd use a library to render the first page
       return NextResponse.json({
         thumbnail: null,
         type: 'pdf'

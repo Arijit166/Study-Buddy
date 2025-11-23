@@ -4,11 +4,9 @@ import { Button } from "@/components/ui/button"
 interface ChatMessageProps {
   role: "user" | "assistant"
   content: string
-  hasCode?: boolean
-  hasTable?: boolean
 }
 
-export function ChatMessage({ role, content, hasCode, hasTable }: ChatMessageProps) {
+export function ChatMessage({ role, content }: ChatMessageProps) {
   return (
     <div className={`flex ${role === "user" ? "justify-end" : "justify-start"} mb-4`}>
       <div
@@ -20,15 +18,6 @@ export function ChatMessage({ role, content, hasCode, hasTable }: ChatMessagePro
       >
         {/* Message Content */}
         <div className="text-sm leading-relaxed">{content}</div>
-
-        {/* Code Block Example */}
-        {hasCode && (
-          <div className="mt-3 p-3 rounded-lg bg-muted font-mono text-xs overflow-x-auto">
-            <div className="text-muted-foreground">{"const handleSubmit = () => {"}</div>
-            <div className="text-muted-foreground ml-4">{"// Your code here"}</div>
-            <div className="text-muted-foreground">{"}"}</div>
-          </div>
-        )}
 
         {/* Action Buttons for Assistant Messages */}
         {role === "assistant" && (

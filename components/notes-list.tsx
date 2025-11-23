@@ -249,7 +249,14 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
               <div className="flex items-center gap-2">
                 <Button
                   className="flex-1 gap-2 h-11"
-                  onClick={() => toast.info('Chat feature coming soon!')}
+                  onClick={() => {
+                    // First process the note if not already done
+                    fetch(`/api/notes/${note._id}/process`, { method: 'POST' })
+                      .then(() => {
+                        window.location.href = `/chat/${note._id}`
+                      })
+                      .catch(() => toast.error('Failed to start chat'))
+                  }}
                 >
                   <MessageSquare className="w-4 h-4" />
                   Chat
