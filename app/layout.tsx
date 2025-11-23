@@ -1,13 +1,13 @@
 import Providers from "./providers"
 import type React from "react"
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
+import { Roboto, Fira_Code } from "next/font/google" // Example fonts
+import { Analytics } from "@vercel/analytics/react" // Updated import
 import { Toaster } from "sonner"
 import "./globals.css"
 
-const geist = Geist({ subsets: ["latin"] })
-const geistMono = Geist_Mono({ subsets: ["latin"] })
+const roboto = Roboto({ subsets: ["latin"], weight: ["400", "700"] })
+const firaCode = Fira_Code({ subsets: ["latin"] }) // monospace example
 
 export const metadata: Metadata = {
   title: "AI Study Buddy",
@@ -15,18 +15,9 @@ export const metadata: Metadata = {
   generator: "v0.app",
   icons: {
     icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
+      { url: "/icon-light-32x32.png", media: "(prefers-color-scheme: light)" },
+      { url: "/icon-dark-32x32.png", media: "(prefers-color-scheme: dark)" },
+      { url: "/icon.svg", type: "image/svg+xml" },
     ],
     apple: "/apple-icon.png",
   },
@@ -34,12 +25,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="en">
-      <body className={`${geist.className} font-sans antialiased`}>
+      <body className={`${roboto.className} font-sans antialiased`}>
         <Providers>{children}</Providers>
         <Toaster position="top-right" richColors />
         <Analytics />

@@ -1,19 +1,48 @@
-import mongoose, { Document, Model } from "mongoose";
+import mongoose, { Document, Model } from "mongoose"
 
-export interface INoteVector extends Document {
-  noteId: string;
-  userId: string;
-  extractedText: string;
-  topics: string[];
-  suggestedQuestions: string[];
-  createdAt: Date;
+interface IChunk {
+  content: string
+  embedding: number[]
+  index: number
+  tokens: number
 }
 
-let NoteVector: Model<INoteVector>;
+export interface INoteVector extends Document {
+  noteId: string
+  userId: string
+  extractedText: string
+  chunks: IChunk[]
+  topics: string[]
+  suggestedQuestions: string[]
+  ocrConfidence?: number
+  pageCount?: number
+  createdAt: Date
+}
+
+let NoteVector: Model<INoteVector>
 
 if (mongoose.models.NoteVector) {
-  NoteVector = mongoose.models.NoteVector as Model<INoteVector>;
+  NoteVector = mongoose.models.NoteVector as Model<INoteVector>
 } else {
+  const ChunkSchema = new mongoose.Schema({
+    content: {
+      type: String,
+      required: true,
+    },
+    embedding: {
+      type: [Number],
+      required: true,
+    },
+    index: {
+      type: Number,
+      required: true,
+    },
+    tokens: {
+      type: Number,
+      required: true,
+    },
+  })
+
   const NoteVectorSchema = new mongoose.Schema<INoteVector>({
     noteId: {
       type: String,
@@ -30,19 +59,29 @@ if (mongoose.models.NoteVector) {
       type: String,
       required: true,
     },
+    chunks: [ChunkSchema],
     topics: [{
       type: String,
     }],
     suggestedQuestions: [{
       type: String,
     }],
+    ocrConfidence: {
+      type: Number,
+    },
+    pageCount: {
+      type: Number,
+    },
     createdAt: {
       type: Date,
       default: Date.now,
     },
-  });
+  })
 
-  NoteVector = mongoose.model<INoteVector>("NoteVector", NoteVectorSchema);
+  // Add index for better query performance
+  NoteVectorSchema.index({ userId: 1, noteId: 1 })
+
+  NoteVector = mongoose.model<INoteVector>("NoteVector", NoteVectorSchema)
 }
 
-export default NoteVector;
+export default NoteVector

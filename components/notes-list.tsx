@@ -249,13 +249,28 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
               <div className="flex items-center gap-2">
                 <Button
                   className="flex-1 gap-2 h-11"
-                  onClick={() => {
-                    // First process the note if not already done
-                    fetch(`/api/notes/${note._id}/process`, { method: 'POST' })
-                      .then(() => {
-                        window.location.href = `/chat/${note._id}`
+                  onClick={async () => {
+                    try {
+                      toast.loading('Processing note...', { id: 'process' })
+                      
+                      const response = await fetch(`/api/notes/${note._id}/process`, { 
+                        method: 'POST' 
                       })
-                      .catch(() => toast.error('Failed to start chat'))
+                      
+                      const data = await response.json()
+                      
+                      if (!response.ok) {
+                        toast.error(data.error || 'Failed to process note', { id: 'process' })
+                        console.error('Process error:', data)
+                        return
+                      }
+                      
+                      toast.success('Note processed!', { id: 'process' })
+                      window.location.href = `/chat/${note._id}`
+                    } catch (error) {
+                      console.error('Process error:', error)
+                      toast.error('Failed to process note', { id: 'process' })
+                    }
                   }}
                 >
                   <MessageSquare className="w-4 h-4" />

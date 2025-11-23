@@ -2,18 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/lib/mongodb'
 import Note from '@/models/Note'
 import NoteVector from '@/models/NoteVector'
-import Groq from 'groq-sdk'
 import { getCurrentUser } from '@/lib/auth'
-
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-})
-
-async function parsePdfBuffer(buffer: Buffer): Promise<string> {
-  const pdf = require('pdf-parse')
-  const data = await pdf(buffer)
-  return data.text
-}
+import { extractText } from '@/lib/ocr'
+import { chunkText, extractTopics } from '@/lib/textChunker'
+import { generateEmbedding } from '@/lib/embeddings'
+import { generateStudyQuestions } from '@/lib/questionGenerator'
 
 export async function POST(
   req: NextRequest,
@@ -26,12 +19,29 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { id } = await params
+    const { id: noteId } = await params
 
     await connectDB()
-    
+
+    // Check if already processed
+    const existingVector = await NoteVector.findOne({
+      noteId: noteId,
+      userId: user.userId,
+    })
+
+    if (existingVector) {
+      return NextResponse.json({ 
+        message: 'Note already processed',
+        data: {
+          topics: existingVector.topics,
+          suggestedQuestions: existingVector.suggestedQuestions
+        }
+      })
+    }
+
+    // Get the note
     const note = await Note.findOne({
-      _id: id,
+      _id: noteId,
       userId: user.userId,
     })
 
@@ -39,95 +49,81 @@ export async function POST(
       return NextResponse.json({ error: 'Note not found' }, { status: 404 })
     }
 
-    const existing = await NoteVector.findOne({ noteId: id })
-    if (existing) {
-      return NextResponse.json({ 
-        message: 'Already processed',
-        data: existing 
-      })
-    }
+    console.log('Starting OCR extraction...')
 
-    let extractedText = ''
-    if (note.fileType.includes('pdf')) {
-      try {
-        extractedText = await parsePdfBuffer(note.fileData)
-      } catch (pdfError) {
-        console.error('PDF parse error:', pdfError)
-        return NextResponse.json({ 
-          error: 'Failed to extract PDF text. Please ensure the PDF is readable.' 
-        }, { status: 400 })
-      }
-    } else {
-      extractedText = note.fileData.toString('utf-8')
-    }
+    // Step 1: Extract text using OCR
+    const fileBuffer = typeof note.fileData === 'string' 
+      ? Buffer.from(note.fileData, 'base64')
+      : Buffer.from((note.fileData as any).data || note.fileData)
+    const { text: extractedText, confidence, pages } = await extractText(
+      fileBuffer,
+      note.fileType
+    )
 
     if (!extractedText || extractedText.length < 50) {
       return NextResponse.json({ 
-        error: 'Could not extract sufficient text from the document' 
+        error: 'Could not extract sufficient text from the document. Please ensure the file contains readable text or clear images.' 
       }, { status: 400 })
     }
 
-    const topicsResponse = await groq.chat.completions.create({
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an educational assistant. Extract 5-8 main topics from the given text. Return only a JSON array of topic strings, nothing else.',
-        },
-        {
-          role: 'user',
-          content: `Extract main topics from this text:\n\n${extractedText.slice(0, 4000)}`,
-        },
-      ],
-      model: 'llama-3.1-70b-versatile',
-      temperature: 0.3,
-      max_tokens: 500,
-    })
+    console.log(`Text extracted: ${extractedText.length} characters from ${pages} page(s)`)
+    console.log(`OCR Confidence: ${confidence.toFixed(2)}%`)
 
-    let topics: string[] = []
-    try {
-      topics = JSON.parse(topicsResponse.choices[0]?.message?.content || '[]')
-    } catch {
-      topics = ['General Content']
-    }
+    // Step 2: Chunk the text
+    console.log('Chunking text...')
+    const chunks = chunkText(extractedText, 500, 50)
+    console.log(`Created ${chunks.length} chunks`)
 
-    const questionsResponse = await groq.chat.completions.create({
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an educational assistant. Generate 5 study questions based on the content. Return only a JSON array of question strings, nothing else.',
-        },
-        {
-          role: 'user',
-          content: `Generate study questions from this text:\n\n${extractedText.slice(0, 4000)}`,
-        },
-      ],
-      model: 'llama-3.1-70b-versatile',
-      temperature: 0.5,
-      max_tokens: 500,
-    })
+    // Step 3: Generate embeddings for each chunk
+    console.log('Generating embeddings...')
+    const chunksWithEmbeddings = await Promise.all(
+      chunks.map(async (chunk) => {
+        const { vector } = await generateEmbedding(chunk.content)
+        return {
+          content: chunk.content,
+          embedding: vector,
+          index: chunk.index,
+          tokens: chunk.tokens
+        }
+      })
+    )
 
-    let suggestedQuestions: string[] = []
-    try {
-      suggestedQuestions = JSON.parse(questionsResponse.choices[0]?.message?.content || '[]')
-    } catch {
-      suggestedQuestions = ['What are the main concepts?', 'Can you summarize this?']
-    }
+    // Step 4: Extract topics
+    console.log('Extracting topics...')
+    const topics = extractTopics(extractedText, 6)
 
+    // Step 5: Generate study questions
+    console.log('Generating study questions...')
+    const suggestedQuestions = await generateStudyQuestions(extractedText, 6)
+
+    // Step 6: Save to database
+    console.log('Saving to database...')
     const noteVector = await NoteVector.create({
-      noteId: id,
+      noteId: noteId,
       userId: user.userId,
-      extractedText,
-      topics,
-      suggestedQuestions,
+      extractedText: extractedText,
+      chunks: chunksWithEmbeddings,
+      topics: topics,
+      suggestedQuestions: suggestedQuestions,
+      ocrConfidence: confidence,
+      pageCount: pages,
     })
+
+    console.log('Processing complete!')
 
     return NextResponse.json({ 
-      message: 'Processing complete',
-      data: noteVector 
+      message: 'Note processed successfully',
+      data: {
+        topics: noteVector.topics,
+        suggestedQuestions: noteVector.suggestedQuestions,
+        confidence: confidence,
+        pages: pages,
+        chunks: chunks.length
+      }
     })
 
   } catch (error) {
-    console.error('Process error:', error)
+    console.error('Process note error:', error)
     return NextResponse.json({ 
       error: 'Failed to process note',
       details: error instanceof Error ? error.message : 'Unknown error'
