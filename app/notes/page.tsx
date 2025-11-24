@@ -9,10 +9,21 @@ import { useState } from "react"
 
 export default function NotesPage() {
   const { user, loading } = useUser()
-  const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const [refreshKey, setRefreshKey] = useState(0)
+  const [refreshComplete, setRefreshComplete] = useState<(() => void) | null>(null)
 
   const handleUploadSuccess = () => {
-    setRefreshTrigger(prev => prev + 1)
+    return new Promise<void>((resolve) => {
+      setRefreshComplete(() => resolve)
+      setRefreshKey(prev => prev + 1)
+    })
+  }
+
+  const handleRefreshComplete = () => {
+    if (refreshComplete) {
+      refreshComplete()
+      setRefreshComplete(null)
+    }
   }
 
   if (loading) {
@@ -35,7 +46,10 @@ export default function NotesPage() {
         <main className="flex-1 overflow-auto">
           <div className="p-8 space-y-6">
             <FileUploadZone onUploadSuccess={handleUploadSuccess} />
-            <NotesList refreshTrigger={refreshTrigger} />
+            <NotesList 
+              refreshTrigger={refreshKey} 
+              onRefreshComplete={handleRefreshComplete}
+            />
           </div>
         </main>
       </div>

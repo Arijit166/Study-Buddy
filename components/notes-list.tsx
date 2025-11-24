@@ -26,59 +26,37 @@ interface Note {
   createdAt: string
 }
 
-export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
-  const [notes, setNotes] = useState<Note[]>([])
-  const [loading, setLoading] = useState(true)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [downloadingId, setDownloadingId] = useState<string | null>(null)
-  const [previews, setPreviews] = useState<Record<string, string>>({})
-  const [loadingPreviews, setLoadingPreviews] = useState<Record<string, boolean>>({})
+export function NotesList({ refreshTrigger, onRefreshComplete }: { 
+    refreshTrigger?: number
+    onRefreshComplete?: () => void 
+  }) {
+    const [notes, setNotes] = useState<Note[]>([])
+    const [loading, setLoading] = useState(true)
+    const [deletingId, setDeletingId] = useState<string | null>(null)
+    const [downloadingId, setDownloadingId] = useState<string | null>(null)
 
-  const fetchNotes = async () => {
-    try {
-      const response = await fetch('/api/notes')
-      const data = await response.json()
-      
-      if (response.ok) {
-        setNotes(data.notes)
-        // Load previews for each note
-        data.notes.forEach((note: Note) => {
-          loadPreview(note._id, note.fileType)
-        })
-      } else {
+    const fetchNotes = async () => {
+      try {
+        const response = await fetch('/api/notes')
+        const data = await response.json()
+        
+        if (response.ok) {
+          setNotes(data.notes)
+        } else {
+          toast.error('Failed to load notes')
+        }
+      } catch (error) {
+        console.error('Fetch notes error:', error)
         toast.error('Failed to load notes')
+      } finally {
+        setLoading(false)
+        onRefreshComplete?.() // Call when refresh is complete
       }
-    } catch (error) {
-      console.error('Fetch notes error:', error)
-      toast.error('Failed to load notes')
-    } finally {
-      setLoading(false)
     }
-  }
 
-  const loadPreview = async (id: string, fileType: string) => {
-    setLoadingPreviews(prev => ({ ...prev, [id]: true }))
-    
-    try {
-      const response = await fetch(`/api/notes/${id}/thumbnail`)
-      const data = await response.json()
-
-      if (response.ok && data.thumbnail) {
-        setPreviews(prev => ({
-          ...prev,
-          [id]: `data:${data.type};base64,${data.thumbnail}`
-        }))
-      }
-    } catch (error) {
-      console.error('Preview load error:', error)
-    } finally {
-      setLoadingPreviews(prev => ({ ...prev, [id]: false }))
-    }
-  }
-
-  useEffect(() => {
-    fetchNotes()
-  }, [refreshTrigger])
+    useEffect(() => {
+      fetchNotes()
+    }, [refreshTrigger])
 
   const handleDelete = async (id: string) => {
     setDeletingId(id)
@@ -93,11 +71,6 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
       if (response.ok) {
         toast.success('Note deleted successfully')
         setNotes(notes.filter(note => note._id !== id))
-        setPreviews(prev => {
-          const newPreviews = { ...prev }
-          delete newPreviews[id]
-          return newPreviews
-        })
       } else {
         toast.error(data.error || 'Failed to delete note')
       }
@@ -218,18 +191,19 @@ export function NotesList({ refreshTrigger }: { refreshTrigger?: number }) {
 
               {/* File Preview */}
               <div className="mb-4 bg-muted/30 rounded-lg overflow-hidden aspect-video flex items-center justify-center">
-                {loadingPreviews[note._id] ? (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  </div>
-                ) : previews[note._id] ? (
+                {note.fileType.includes('pdf') ? (
+                  <PDFPlaceholder />
+                ) : note.fileType.includes('image') ? (
                   <img 
-                    src={previews[note._id]} 
+                    src={`/api/notes/${note._id}/thumbnail?t=${note.createdAt}`}
                     alt={note.name}
                     className="w-full h-full object-cover"
+                    loading="lazy"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
                   />
-                ) : note.fileType.includes('pdf') ? (
-                  <PDFPlaceholder />
                 ) : (
                   <FileText className="w-16 h-16 text-muted-foreground" />
                 )}

@@ -20,35 +20,6 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const [lastChatNoteId, setLastChatNoteId] = useState<string | null>(null)
-
-  useEffect(() => {
-    // Fetch last chat session on mount
-    fetch('/api/chat/last')
-      .then(res => res.json())
-      .then(data => {
-        if (data.noteId) {
-          setLastChatNoteId(data.noteId)
-        }
-      })
-      .catch(err => console.error('Failed to fetch last chat:', err))
-  }, [])
-  useEffect(() => {
-    const handleChatUpdate = () => {
-      // Refresh last chat when a message is sent
-      fetch('/api/chat/last')
-        .then(res => res.json())
-        .then(data => {
-          if (data.noteId) {
-            setLastChatNoteId(data.noteId)
-          }
-        })
-        .catch(err => console.error('Failed to fetch last chat:', err))
-    }
-
-    window.addEventListener('chatUpdated', handleChatUpdate)
-    return () => window.removeEventListener('chatUpdated', handleChatUpdate)
-  }, [])
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -68,11 +39,27 @@ export function Sidebar() {
     }
   }
 
-  const handleNavClick = (item: typeof navItems[0]) => {
+  const handleNavClick = async (item: typeof navItems[0]) => {
     if (item.label === "AI Chat") {
-      if (lastChatNoteId) {
-        router.push(`/chat/${lastChatNoteId}`)
-      } else {
+      // Check if we're currently viewing a note/chat
+      const currentNoteId = pathname.match(/\/chat\/([a-zA-Z0-9]+)/)?.[1]
+      
+      if (currentNoteId) {
+        // If already in a chat, stay on that note
+        return
+      }
+      
+      // Only redirect to last chat if coming from somewhere else
+      try {
+        const res = await fetch('/api/chat/last')
+        const data = await res.json()
+        
+        if (data.noteId) {
+          router.push(`/chat/${data.noteId}?t=${Date.now()}`)
+        } else {
+          router.push('/notes')
+        }
+      } catch (error) {
         router.push('/notes')
       }
     }

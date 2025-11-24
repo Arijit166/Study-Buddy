@@ -45,16 +45,9 @@ if (mongoose.models.ChatSession) {
         default: Date.now,
       },
     }],
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
+  }, { 
+    timestamps: true
   });
-
   ChatSession = mongoose.model<IChatSession>("ChatSession", ChatSessionSchema);
 }
 

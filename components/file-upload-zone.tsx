@@ -21,7 +21,7 @@ interface PendingFile {
   id: string
 }
 
-export function FileUploadZone({ onUploadSuccess }: { onUploadSuccess?: () => void }) {
+export function FileUploadZone({ onUploadSuccess }: { onUploadSuccess?: () => Promise<void> }) {
   const [dragActive, setDragActive] = useState(false)
   const [showNameDialog, setShowNameDialog] = useState(false)
   const [pendingFile, setPendingFile] = useState<PendingFile | null>(null)
@@ -87,6 +87,7 @@ export function FileUploadZone({ onUploadSuccess }: { onUploadSuccess?: () => vo
     }
 
     setUploading(true)
+    toast.loading('Uploading file...', { id: 'upload' })
 
     try {
       const formData = new FormData()
@@ -101,17 +102,23 @@ export function FileUploadZone({ onUploadSuccess }: { onUploadSuccess?: () => vo
       const data = await response.json()
 
       if (response.ok) {
-        toast.success('File uploaded successfully!')
         setShowNameDialog(false)
         setPendingFile(null)
         setNoteName("")
-        onUploadSuccess?.()
+        
+        // Wait for the notes list to refresh completely
+        if (onUploadSuccess) {
+          await onUploadSuccess()  // Add await here
+        }
+        
+        // Now show success after notes are loaded
+        toast.success('File uploaded successfully!', { id: 'upload' })
       } else {
-        toast.error(data.error || 'Failed to upload file')
+        toast.error(data.error || 'Failed to upload file', { id: 'upload' })
       }
     } catch (error) {
       console.error('Upload error:', error)
-      toast.error('Failed to upload file')
+      toast.error('Failed to upload file', { id: 'upload' })
     } finally {
       setUploading(false)
     }

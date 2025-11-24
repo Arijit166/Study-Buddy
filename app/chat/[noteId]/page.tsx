@@ -8,6 +8,7 @@ import { ChatMessage } from "@/components/chat-message"
 import { ChatSidebar } from "@/components/chat-sidebar"
 import { ChatInput } from "@/components/chat-input"
 import { toast } from "sonner"
+import { useUser } from "@/hooks/use-user"
 
 interface Message {
   role: "user" | "assistant"
@@ -17,6 +18,7 @@ interface Message {
 export default function ChatPage() {
   const params = useParams()
   const noteId = params.noteId as string
+  const { user } = useUser()
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
@@ -69,7 +71,6 @@ export default function ChatPage() {
           content: data.message 
         }])
         
-        // Trigger sidebar refresh by dispatching custom event
         window.dispatchEvent(new Event('chatUpdated'))
       } else {
         toast.error(data.error || 'Failed to send message')
@@ -97,7 +98,11 @@ export default function ChatPage() {
     <div className="flex h-screen bg-background">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <TopNavbar title="AI Chat" />
+        <TopNavbar 
+          title="AI Chat" 
+          userName={user?.name}
+          userAvatar={user?.avatar}
+        />
         <main className="flex-1 flex overflow-hidden">
           <div className="flex-1 flex flex-col bg-background">
             <div className="flex-1 overflow-y-auto p-6 space-y-2">

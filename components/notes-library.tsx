@@ -10,7 +10,7 @@ import { useState } from "react"
 export default function NotesPage() {
   const { user, loading } = useUser()
   const [refreshTrigger, setRefreshTrigger] = useState(0)
-
+  const [refreshKey, setRefreshKey] = useState(0)
   const handleUploadSuccess = () => {
     setRefreshTrigger(prev => prev + 1)
   }
@@ -34,8 +34,8 @@ export default function NotesPage() {
         />
         <main className="flex-1 overflow-auto">
           <div className="p-8 space-y-6">
-            <FileUploadZone onUploadSuccess={handleUploadSuccess} />
-            <NotesList refreshTrigger={refreshTrigger} />
+            <FileUploadZone onUploadSuccess={() => setRefreshKey(prev => prev + 1)} />
+            <NotesList refreshTrigger={refreshKey} />
           </div>
         </main>
       </div>
