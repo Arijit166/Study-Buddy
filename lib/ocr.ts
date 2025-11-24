@@ -1,5 +1,3 @@
-import sharp from 'sharp'
-import FormData from 'form-data'
 import fetch from 'node-fetch'
 
 interface OCRResult {
@@ -9,148 +7,53 @@ interface OCRResult {
 }
 
 /**
- * Pre-process image for better OCR accuracy
+ * Extract text using PyMuPDF microservice
  */
-async function preprocessImage(inputBuffer: Buffer): Promise<Buffer> {
-  return sharp(inputBuffer)
-    .resize({ width: 2000, withoutEnlargement: false })
-    .greyscale()
-    .normalize()
-    .sharpen()
-    .png()
-    .toBuffer()
-}
-
-/**
- * Extract text using OCR.space API (Free tier: 25,000 requests/month)
- */
-async function extractTextWithOCRSpace(imageBuffer: Buffer): Promise<{ text: string; confidence: number }> {
+async function extractTextWithPyMuPDF(fileBuffer: Buffer, mimeType: string): Promise<OCRResult> {
   try {
-    const processedImage = await preprocessImage(imageBuffer)
-    const base64Image = processedImage.toString('base64')
+    const base64File = fileBuffer.toString('base64')
     
-    const formData = new FormData()
-    formData.append('base64Image', `data:image/png;base64,${base64Image}`)
-    formData.append('language', 'eng')
-    formData.append('isOverlayRequired', 'false')
-    formData.append('OCREngine', '2')
-    
-    const response = await fetch('https://api.ocr.space/parse/image', {
+    const response = await fetch('http://localhost:5000/extract', {
       method: 'POST',
       headers: {
-        'apikey': process.env.OCR_SPACE_API_KEY || 'K87899142388957',
+        'Content-Type': 'application/json',
       },
-      body: formData
+      body: JSON.stringify({
+        file: base64File,
+        mimeType: mimeType
+      })
     })
+    
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'OCR processing failed')
+    }
     
     const result = await response.json()
     
-    if (result.IsErroredOnProcessing) {
-      throw new Error(result.ErrorMessage?.[0] || 'OCR processing failed')
-    }
-    
-    const text = result.ParsedResults?.[0]?.ParsedText || ''
-    
     return {
-      text: text.trim(),
-      confidence: 85
+      text: result.text.trim(),
+      confidence: result.confidence,
+      pages: result.pages
     }
   } catch (error) {
-    console.error('OCR.space extraction error:', error)
-    throw new Error('Failed to extract text from image')
+    console.error('PyMuPDF extraction error:', error)
+    throw new Error('Failed to extract text: ' + (error instanceof Error ? error.message : 'Unknown error'))
   }
 }
 
 /**
- * Extract text from PDF using OCR.space API directly
- */
-async function extractTextFromPDFWithOCR(pdfBuffer: Buffer): Promise<OCRResult> {
-  try {
-    const base64Pdf = pdfBuffer.toString('base64')
-    
-    const formData = new FormData()
-    formData.append('base64Image', `data:application/pdf;base64,${base64Pdf}`)
-    formData.append('language', 'eng')
-    formData.append('isOverlayRequired', 'false')
-    formData.append('OCREngine', '2')
-    
-    const response = await fetch('https://api.ocr.space/parse/image', {
-      method: 'POST',
-      headers: {
-        'apikey': process.env.OCR_SPACE_API_KEY || 'K87899142388957',
-      },
-      body: formData
-    })
-    
-    const result = await response.json()
-    
-    if (result.IsErroredOnProcessing) {
-      throw new Error(result.ErrorMessage?.[0] || 'OCR processing failed')
-    }
-    
-    const text = result.ParsedResults?.[0]?.ParsedText || ''
-    
-    return {
-      text: text.trim(),
-      confidence: 85,
-      pages: result.ParsedResults?.length || 1
-    }
-  } catch (error) {
-    console.error('PDF OCR error:', error)
-    throw new Error('Failed to extract text from PDF with OCR')
-  }
-}
-
-/**
- * Extract text from PDF (tries direct extraction first, then OCR)
+ * Extract text from PDF
  */
 export async function extractTextFromPDF(pdfBuffer: Buffer): Promise<OCRResult> {
-  try {
-    const pdfParse = require('pdf-parse')
-    
-    // Try direct PDF text extraction first
-    try {
-      const data = await pdfParse(pdfBuffer)
-      
-      if (data.text && data.text.trim().length > 100) {
-        console.log('✅ Extracted text directly from PDF (not scanned)')
-        return {
-          text: data.text,
-          confidence: 95,
-          pages: data.numpages
-        }
-      }
-    } catch (e) {
-      console.log('Direct PDF extraction failed, will use OCR...')
-    }
-    
-    // If direct extraction fails, use OCR.space API directly on PDF
-    console.log('⚠️ PDF appears to be scanned. Using OCR.space API...')
-    
-    return await extractTextFromPDFWithOCR(pdfBuffer)
-    
-  } catch (error) {
-    console.error('PDF text extraction error:', error)
-    throw new Error('Failed to extract text from PDF: ' + (error instanceof Error ? error.message : 'Unknown error'))
-  }
+  return extractTextWithPyMuPDF(pdfBuffer, 'application/pdf')
 }
 
 /**
  * Extract text from image file
  */
 export async function extractTextFromImageFile(imageBuffer: Buffer): Promise<OCRResult> {
-  try {
-    const { text, confidence } = await extractTextWithOCRSpace(imageBuffer)
-    
-    return {
-      text,
-      confidence,
-      pages: 1
-    }
-  } catch (error) {
-    console.error('Image text extraction error:', error)
-    throw new Error('Failed to extract text from image')
-  }
+  return extractTextWithPyMuPDF(imageBuffer, 'image/png')
 }
 
 /**
