@@ -20,8 +20,10 @@ export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
 
   const handleLogout = async () => {
+    setShowLogoutDialog(false)
     setIsLoggingOut(true)
     try {
       const response = await fetch('/api/auth/logout', {
@@ -66,78 +68,107 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-64 h-screen bg-sidebar border-r border-sidebar-border flex flex-col">
-      {/* Logo */}
-      <div className="px-6 py-8 border-b border-sidebar-border">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
-            <span className="text-lg font-bold text-white">🎓</span>
-          </div>
-          <div>
-            <h1 className="font-bold text-foreground text-lg">Study Buddy</h1>
-            <p className="text-xs text-muted-foreground">AI Learning</p>
+    <>
+      <aside className="w-64 h-screen bg-sidebar border-r border-sidebar-border flex flex-col">
+        {/* Logo */}
+        <div className="px-6 py-8 border-b border-sidebar-border">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
+              <span className="text-lg font-bold text-white">🎓</span>
+            </div>
+            <div>
+              <h1 className="font-bold text-foreground text-lg">Study Buddy</h1>
+              <p className="text-xs text-muted-foreground">AI Learning</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon
-          const isActive = item.dynamic 
-            ? pathname.startsWith('/chat')
-            : pathname === item.href
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
+          {navItems.map((item) => {
+            const Icon = item.icon
+            const isActive = item.dynamic
+              ? pathname.startsWith('/chat')
+              : pathname === item.href
 
-          if (item.dynamic) {
+            if (item.dynamic) {
+              return (
+                <Button
+                  key={item.href}
+                  onClick={() => handleNavClick(item)}
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start text-base gap-3 px-4 py-2 h-11 rounded-lg transition-all duration-200",
+                    isActive
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/20 hover:text-sidebar-foreground",
+                  )}
+                >
+                  <Icon className="w-5 h-5" />
+                  {item.label}
+                </Button>
+              )
+            }
+
             return (
-              <Button
-                key={item.href}
-                onClick={() => handleNavClick(item)}
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start text-base gap-3 px-4 py-2 h-11 rounded-lg transition-all duration-200",
-                  isActive
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/20 hover:text-sidebar-foreground",
-                )}
-              >
-                <Icon className="w-5 h-5" />
-                {item.label}
-              </Button>
+              <Link key={item.href} href={item.href}>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start text-base gap-3 px-4 py-2 h-11 rounded-lg transition-all duration-200",
+                    isActive
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/20 hover:text-sidebar-foreground",
+                  )}
+                >
+                  <Icon className="w-5 h-5" />
+                  {item.label}
+                </Button>
+              </Link>
             )
-          }
+          })}
+        </nav>
 
-          return (
-            <Link key={item.href} href={item.href}>
+        {/* Footer */}
+        <div className="px-3 py-4 border-t border-sidebar-border">
+          <Button
+            onClick={() => setShowLogoutDialog(true)}
+            disabled={isLoggingOut}
+            variant="outline"
+            className="w-full justify-start gap-3 h-10 rounded-lg bg-transparent hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+          </Button>
+        </div>
+      </aside>
+
+      {/* Logout Confirmation Dialog */}
+      {showLogoutDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-card border border-border rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Confirm Logout</h3>
+            <p className="text-muted-foreground mb-6">
+              Are you sure you want to logout? You will be redirected to the login page.
+            </p>
+            <div className="flex gap-3 justify-end">
               <Button
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start text-base gap-3 px-4 py-2 h-11 rounded-lg transition-all duration-200",
-                  isActive
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground shadow-md"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/20 hover:text-sidebar-foreground",
-                )}
+                variant="outline"
+                onClick={() => setShowLogoutDialog(false)}
+                className="px-4"
               >
-                <Icon className="w-5 h-5" />
-                {item.label}
+                Cancel
               </Button>
-            </Link>
-          )
-        })}
-      </nav>
-
-      {/* Footer */}
-      <div className="px-3 py-4 border-t border-sidebar-border">
-        <Button 
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-          variant="outline" 
-          className="w-full justify-start gap-3 h-10 rounded-lg bg-transparent hover:bg-red-50 hover:text-red-600 hover:border-red-200"
-        >
-          <LogOut className="w-4 h-4" />
-          <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
-        </Button>
-      </div>
-    </aside>
+              <Button
+                onClick={handleLogout}
+                className="px-4 bg-red-600 hover:bg-red-700 text-white"
+              >
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }

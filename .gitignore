@@ -4,3 +4,4 @@ package-lock.json
 package.json
 .next/
 public/uploads/avatars/
+python-service/.env
