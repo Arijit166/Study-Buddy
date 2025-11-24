@@ -34,7 +34,7 @@ export default function NotesPage() {
         />
         <main className="flex-1 overflow-auto">
           <div className="p-8 space-y-6">
-            <FileUploadZone onUploadSuccess={() => setRefreshKey(prev => prev + 1)} />
+            <FileUploadZone onUploadSuccess={async () => setRefreshKey(prev => prev + 1)} />
             <NotesList refreshTrigger={refreshKey} />
           </div>
         </main>

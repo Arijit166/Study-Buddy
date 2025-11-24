@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Sidebar } from "@/components/sidebar"
 import { TopNavbar } from "@/components/top-navbar"
+import { useUser } from "@/hooks/use-user"
 import { QuizSetup } from "@/components/quiz-setup"
 import { QuizQuestion } from "@/components/quiz-question"
 
@@ -34,7 +35,7 @@ const sampleQuestions = [
 export default function QuizzesPage() {
   const [quizStarted, setQuizStarted] = useState(false)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-
+  const { user } = useUser()
   if (quizStarted) {
     const currentQ = sampleQuestions[currentQuestionIndex]
 
@@ -43,8 +44,10 @@ export default function QuizzesPage() {
         <Sidebar />
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <TopNavbar title="Quiz - Biology Fundamentals" />
-
+          <TopNavbar title="Quiz - Biology Fundamentals"
+            userName={user?.name}
+            userAvatar={user?.avatar}
+          />
           <main className="flex-1 overflow-auto p-8">
             <QuizQuestion
               questionNumber={currentQuestionIndex + 1}
@@ -69,8 +72,10 @@ export default function QuizzesPage() {
       <Sidebar />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <TopNavbar title="Quizzes" />
-
+        <TopNavbar title="Quizzes" 
+          userName={user?.name}
+          userAvatar={user?.avatar}
+        />
         <main className="flex-1 overflow-auto p-8">
           <div className="space-y-8">
             <div>
