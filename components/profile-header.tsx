@@ -2,11 +2,13 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Camera, Mail, Calendar, X, Check, Pencil } from "lucide-react"
 import { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input"
+
 interface ProfileHeaderProps {
   userName?: string;
   userEmail?: string;
   userAvatar?: string;
   createdAt?: Date | string;
+  currentStreak?: number;
   onUpdateProfile?: (name: string, avatar: string | null) => void;
 }
 
@@ -15,18 +17,21 @@ export function ProfileHeader({
   userEmail,
   userAvatar,
   createdAt,
+  currentStreak,
   onUpdateProfile
 }: ProfileHeaderProps) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState(userName || "");
   const [currentAvatar, setCurrentAvatar] = useState(userAvatar);
+  
   useEffect(() => {
-      setEditedName(userName || "");
-    }, [userName]);
+    setEditedName(userName || "");
+  }, [userName]);
 
-    useEffect(() => {
-      setCurrentAvatar(userAvatar);
-    }, [userAvatar]);
+  useEffect(() => {
+    setCurrentAvatar(userAvatar);
+  }, [userAvatar]);
+  
   const getInitials = (name: string) => {
     if (!name) return "U";
     const parts = name.split(' ');
@@ -73,7 +78,6 @@ export function ProfileHeader({
 
   const handleRemoveAvatar = () => {
     setCurrentAvatar(undefined);
-    // Use userName consistently
     onUpdateProfile?.(userName || "", null);
   };
 
@@ -169,8 +173,12 @@ export function ProfileHeader({
                 </p>
               </div>
               <div>
-                <p className="text-muted-foreground">Study streak</p>
-                <p className="font-semibold text-foreground">7 days</p>
+                <p className="text-muted-foreground">Current streak</p>
+                <p className="font-semibold text-foreground">
+                  {currentStreak !== undefined 
+                    ? `${currentStreak} ${currentStreak === 1 ? 'day' : 'days'}` 
+                    : 'Loading...'}
+                </p>
               </div>
             </div>
           </div>

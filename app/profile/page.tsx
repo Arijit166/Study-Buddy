@@ -1,19 +1,39 @@
 "use client"
-import { CardContent } from "@/components/ui/card"
+
 import { Card } from "@/components/ui/card"
 import { Sidebar } from "@/components/sidebar"
 import { TopNavbar } from "@/components/top-navbar"
 import { ProfileHeader } from "@/components/profile-header"
 import { StudyStatsDetailed } from "@/components/study-stats-detailed"
+import { ProfileStatsCards } from "@/components/profile-stats-cards"
 import { SettingsSection } from "@/components/settings-section"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useUser } from "@/hooks/use-user"
 import { toast } from "sonner"
+import { useEffect, useState } from "react"
 
 export default function ProfilePage() {
   const { user, loading, updateUser } = useUser();
+  const [currentStreak, setCurrentStreak] = useState(0);
 
-  // ADD THIS FUNCTION
+  useEffect(() => {
+    if (user) {
+      fetchStreak();
+    }
+  }, [user]);
+
+  const fetchStreak = async () => {
+    try {
+      const res = await fetch("/api/profile/stats");
+      if (res.ok) {
+        const data = await res.json();
+        setCurrentStreak(data.currentStreak);
+      }
+    } catch (error) {
+      console.error("Failed to fetch streak:", error);
+    }
+  };
+
   const handleUpdateProfile = async (name: string, avatar: string | null) => {
     const result = await updateUser(name, avatar);
     
@@ -45,12 +65,13 @@ export default function ProfilePage() {
 
         <main className="flex-1 overflow-auto">
           <div className="p-8 space-y-8">
-            {/* Profile Header - ADD onUpdateProfile prop */}
+            {/* Profile Header */}
             <ProfileHeader 
               userName={user?.name}
               userEmail={user?.email}
               userAvatar={user?.avatar}
               createdAt={user?.createdAt}
+              currentStreak={currentStreak}
               onUpdateProfile={handleUpdateProfile}
             />
 
@@ -68,22 +89,7 @@ export default function ProfilePage() {
               <TabsContent value="statistics" className="space-y-6">
                 <StudyStatsDetailed />
 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  {[
-                    { label: "Total Study Hours", value: "44", unit: "hours" },
-                    { label: "Quizzes Completed", value: "14", unit: "quizzes" },
-                    { label: "Notes Uploaded", value: "18", unit: "files" },
-                    { label: "Current Streak", value: "7", unit: "days" },
-                  ].map((stat, idx) => (
-                    <Card key={idx} className="border-0 shadow-md">
-                      <CardContent className="p-4">
-                        <p className="text-xs font-medium text-muted-foreground uppercase">{stat.label}</p>
-                        <p className="text-3xl font-bold text-foreground mt-2">{stat.value}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{stat.unit}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                <ProfileStatsCards />
               </TabsContent>
 
               <TabsContent value="settings">

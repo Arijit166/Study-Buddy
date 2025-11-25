@@ -17,7 +17,7 @@ export const config = {
     "/dashboard/:path*",
     "/flashcards/:path*",
     "/notes/:path*",
-    "/profiles/:path*",
+    "/profile/:path*",
     "/quizzes/:path*",
   ],
 };

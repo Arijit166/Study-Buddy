@@ -1,14 +1,53 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { useEffect, useState } from "react"
 
-const studyHistory = [
-  { week: "Week 1", hours: 8, quizzes: 2, notes: 3 },
-  { week: "Week 2", hours: 12, quizzes: 4, notes: 5 },
-  { week: "Week 3", hours: 10, quizzes: 3, notes: 4 },
-  { week: "Week 4", hours: 14, quizzes: 5, notes: 6 },
-]
+interface WeeklyData {
+  week: string;
+  quizzes: number;
+  notes: number;
+}
 
 export function StudyStatsDetailed() {
+  const [studyHistory, setStudyHistory] = useState<WeeklyData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStudyHistory();
+  }, []);
+
+  const fetchStudyHistory = async () => {
+    try {
+      const res = await fetch("/api/profile/stats");
+      if (res.ok) {
+        const data = await res.json();
+        setStudyHistory(data.weeklyData);
+      }
+    } catch (error) {
+      console.error("Failed to fetch study history:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Card className="border-0 shadow-md">
+        <CardHeader>
+          <CardTitle>Study History</CardTitle>
+          <CardDescription>Your study activity over the past month</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="border-0 shadow-md">
       <CardHeader>
@@ -29,9 +68,8 @@ export function StudyStatsDetailed() {
               }}
             />
             <Legend />
-            <Bar dataKey="hours" fill="var(--color-primary)" radius={[8, 8, 0, 0]} />
-            <Bar dataKey="quizzes" fill="var(--color-accent)" radius={[8, 8, 0, 0]} />
-            <Bar dataKey="notes" fill="var(--color-secondary)" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="quizzes" fill="var(--color-primary)" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="notes" fill="var(--color-accent)" radius={[8, 8, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
