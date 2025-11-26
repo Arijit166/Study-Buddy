@@ -54,7 +54,7 @@ export function DashboardClient() {
           userName={user?.name}
           userAvatar={user?.avatar}
         />
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto bg-gradient-to-b from-background to-background/95">
           <div className="p-4 md:p-8 space-y-6 md:space-y-8">
             {/* Stats Section */}
             <StudyStats />
@@ -70,9 +70,9 @@ export function DashboardClient() {
             </div>
 
             {/* Quick Actions */}
-            <Card className="border-0 shadow-md bg-gradient-to-r from-primary/5 to-accent/5">
+            <Card className="border border-primary/20 shadow-2xl bg-gradient-to-br from-primary/10 via-card to-secondary/5 backdrop-blur-sm hover:shadow-primary/20 transition-all">
               <CardContent className="p-4 md:p-8">
-                <h3 className="text-base md:text-lg font-semibold text-foreground mb-4">
+                <h3 className="text-base md:text-lg font-bold mb-4 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
                   Quick Actions
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
@@ -80,10 +80,11 @@ export function DashboardClient() {
                     <button
                       key={index}
                       onClick={() => router.push(action.path)}
-                      className="p-4 md:p-5 rounded-lg bg-card hover:bg-card/80 transition-all hover:scale-105 border border-border text-center"
+                      className="group p-4 md:p-6 rounded-xl bg-gradient-to-br from-card to-card/50 hover:from-primary/20 hover:to-secondary/10 transition-all hover:scale-110 border border-border/50 hover:border-primary/50 text-center shadow-lg hover:shadow-primary/30 relative overflow-hidden"
                     >
-                      <p className="text-2xl md:text-3xl mb-2">{action.emoji}</p>
-                      <p className="font-medium text-xs md:text-sm">{action.label}</p>
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-accent/0 group-hover:from-primary/20 group-hover:to-accent/10 transition-all"></div>
+                      <p className="text-2xl md:text-3xl mb-2 relative z-10 group-hover:scale-110 transition-transform">{action.emoji}</p>
+                      <p className="font-semibold text-xs md:text-sm text-foreground relative z-10 group-hover:text-primary transition-colors">{action.label}</p>
                     </button>
                   ))}
                 </div>

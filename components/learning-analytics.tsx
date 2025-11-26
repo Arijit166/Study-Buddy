@@ -34,9 +34,9 @@ export function LearningAnalytics() {
 
   if (loading) {
     return (
-      <Card className="border-0 shadow-md">
+      <Card className="border border-primary/20 shadow-lg bg-gradient-to-br from-card to-card/50 hover:shadow-xl transition-all">
         <CardHeader>
-          <CardTitle>Learning Progress</CardTitle>
+          <CardTitle className="text-gradient">Learning Progress</CardTitle>
           <CardDescription>Your study activity this week</CardDescription>
         </CardHeader>
         <CardContent>
@@ -49,10 +49,10 @@ export function LearningAnalytics() {
   }
 
   return (
-    <Card className="border-0 shadow-md">
+    <Card className="border border-primary/20 shadow-lg bg-gradient-to-br from-card to-card/50 hover:shadow-xl transition-all">
       <CardHeader className="pb-2 md:pb-6">
-        <CardTitle className="text-lg md:text-xl">Learning Progress</CardTitle>
-        <CardDescription className="text-xs md:text-sm">Your study activity this week</CardDescription>
+        <CardTitle className="text-lg md:text-xl bg-gradient-to-r from-foreground to-accent bg-clip-text text-transparent">Learning Progress</CardTitle>
+        <CardDescription className="text-xs md:text-sm text-muted-foreground/70">Your study activity this week</CardDescription>
       </CardHeader>
       <CardContent className="px-2 md:px-6">
         <ResponsiveContainer width="100%" height={250} className="md:h-[300px]">

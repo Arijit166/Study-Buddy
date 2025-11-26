@@ -67,15 +67,15 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="w-64 h-screen bg-sidebar border-r border-sidebar-border flex flex-col">
-        <div className="px-6 py-8 border-b border-sidebar-border">
+      <aside className="w-64 h-screen bg-gradient-to-b from-sidebar to-sidebar/80 border-r border-sidebar-border/50 flex flex-col backdrop-blur-sm shadow-2xl">
+        <div className="px-6 py-8 border-b border-sidebar-border/30 bg-gradient-to-r from-primary/10 to-secondary/10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary shadow-lg shadow-primary/50 flex items-center justify-center">
               <span className="text-lg font-bold text-white">🎓</span>
             </div>
             <div>
               <h1 className="font-bold text-foreground text-lg">Study Buddy</h1>
-              <p className="text-xs text-muted-foreground">AI Learning</p>
+              <p className="text-xs text-muted-foreground/70">AI Learning</p>
             </div>
           </div>
         </div>

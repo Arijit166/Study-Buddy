@@ -45,6 +45,7 @@ export function StudyStats() {
       icon: Clock,
       color: "text-blue-500",
       bgColor: "bg-blue-500/10",
+      gradient: "from-blue-500/20 to-blue-500/5",
     },
     {
       title: "Flashcards Created",
@@ -52,6 +53,7 @@ export function StudyStats() {
       icon: Lightbulb,
       color: "text-green-500",
       bgColor: "bg-green-500/10",
+      gradient: "from-green-500/20 to-green-500/5",
     },
     {
       title: "Chapters Completed",
@@ -59,6 +61,7 @@ export function StudyStats() {
       icon: TrendingUp,
       color: "text-purple-500",
       bgColor: "bg-purple-500/10",
+      gradient: "from-purple-500/20 to-purple-500/5",
     },
     {
       title: "Current Streak",
@@ -66,6 +69,7 @@ export function StudyStats() {
       icon: Flame,
       color: "text-orange-500",
       bgColor: "bg-orange-500/10",
+      gradient: "from-orange-500/20 to-orange-500/5",
     },
   ]
 
@@ -90,19 +94,19 @@ export function StudyStats() {
         return (
           <Card
             key={index}
-            className="border-0 shadow-md hover:shadow-lg transition-shadow duration-200"
+            className={`border border-${stat.gradient.split('/')[0]}/20 shadow-lg hover:shadow-xl hover:shadow-${stat.gradient.split('/')[0]}/30 transition-all duration-300 bg-gradient-to-br from-card to-card/50 hover:scale-105`}
           >
             <CardContent className="p-4 md:p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-xs md:text-sm text-muted-foreground mb-1 md:mb-2">
+                  <p className="text-xs md:text-sm text-muted-foreground/70 mb-1 md:mb-2 font-medium">
                     {stat.title}
                   </p>
-                  <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">
+                  <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-foreground to-accent bg-clip-text text-transparent">
                     {stat.value}
                   </h3>
                 </div>
-                <div className={`p-2 md:p-3 rounded-lg ${stat.bgColor} flex-shrink-0`}>
+                <div className={`p-3 md:p-4 rounded-lg bg-gradient-to-br ${stat.gradient} border border-${stat.gradient.split('/')[0]}/30 shrink-0`}>
                   <Icon className={`w-5 h-5 md:w-6 md:h-6 ${stat.color}`} />
                 </div>
               </div>
