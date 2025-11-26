@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import fitz  # PyMuPDF
+import fitz  
 from PIL import Image
 import io
 import base64
@@ -15,6 +15,8 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
+from datetime import datetime, timedelta
+import re
 
 app = Flask(__name__)
 CORS(app)
@@ -206,6 +208,171 @@ def generate_fallback_questions(topic, question_count, difficulty, question_type
     
     return {"questions": questions}
 
+def generate_fallback_study_plan(topic, start_date, end_date, days):
+    """Generate a basic fallback study plan"""
+    start = datetime.strptime(start_date, '%Y-%m-%d')
+    
+    daily_schedule = []
+    for i in range(min(days, 14)):  # Cap at 14 days for fallback
+        current_date = start + timedelta(days=i)
+        daily_schedule.append({
+            "day": i + 1,
+            "date": current_date.strftime('%A, %B %d, %Y'),
+            "topics": [f"Topic {i + 1} - {topic}"],
+            "activities": [
+                "Review materials",
+                "Complete practice exercises",
+                "Take notes"
+            ],
+            "duration": "2-3 hours"
+        })
+    
+    return {
+        "studyPlan": {
+            "overview": f"A {days}-day study plan for {topic}. This plan is structured to help you progressively build your understanding through daily focused study sessions.",
+            "dailySchedule": daily_schedule,
+            "milestones": [
+                f"Complete foundational concepts by day {days // 4}",
+                f"Finish intermediate topics by day {days // 2}",
+                f"Master advanced concepts by day {3 * days // 4}",
+                f"Complete review and practice by day {days}"
+            ],
+            "tips": [
+                "Take regular breaks every 25-30 minutes",
+                "Review previous day's content before starting new topics",
+                "Practice active recall and spaced repetition",
+                "Create your own examples for each concept",
+                "Join study groups or discussion forums"
+            ]
+        },
+        "mindmap": {
+            "central": topic,
+            "branches": [
+                {
+                    "name": "Fundamentals",
+                    "subbranches": ["Basic Concepts", "Core Principles", "Terminology"]
+                },
+                {
+                    "name": "Key Topics",
+                    "subbranches": ["Topic A", "Topic B", "Topic C"]
+                },
+                {
+                    "name": "Applications",
+                    "subbranches": ["Use Cases", "Examples", "Projects"]
+                }
+            ]
+        }
+    }
+
+def generate_study_plan_with_mindmap(notes_content, topic, start_date, end_date):
+    """Generate comprehensive study plan and mindmap using RAG"""
+    try:
+        # Combine all notes content
+        combined_content = "\n\n".join([
+            f"Note: {note['name']}\n{note['content']}" 
+            for note in notes_content
+        ])
+        
+        # Create vector store
+        vectorstore = create_vector_store(combined_content)
+        
+        # Calculate study duration
+        start = datetime.strptime(start_date, '%Y-%m-%d')
+        end = datetime.strptime(end_date, '%Y-%m-%d')
+        days = (end - start).days + 1
+        
+        # Create prompt template - ONLY use {context} and {question}
+        study_plan_prompt = """You are an expert study planner and educational consultant. Based on the following content, create a detailed study plan.
+
+Content: {context}
+
+Create a comprehensive study plan in JSON format with the following structure:
+{{
+  "studyPlan": {{
+    "overview": "Brief overview of the study plan (2-3 sentences)",
+    "dailySchedule": [
+      {{
+        "day": 1,
+        "date": "formatted date",
+        "topics": ["topic1", "topic2"],
+        "activities": ["activity1", "activity2"],
+        "duration": "2-3 hours"
+      }}
+    ],
+    "milestones": ["milestone1", "milestone2", "milestone3"],
+    "tips": ["tip1", "tip2", "tip3", "tip4"]
+  }},
+  "mindmap": {{
+    "central": "Main topic",
+    "branches": [
+      {{
+        "name": "Branch 1",
+        "subbranches": ["sub1", "sub2", "sub3"]
+      }}
+    ]
+  }}
+}}
+
+Requirements:
+1. Create a daily study schedule with proper progression
+2. Base the plan on the actual content provided
+3. Include specific topics, activities, and time estimates
+4. Provide 4-5 key milestones
+5. Give 4-6 practical study tips
+6. Create a mindmap with 3-5 main branches, each with 3-5 subbranches
+7. Return ONLY valid JSON, no other text
+8. Extract all formulas/equations from the content and include them as a dedicated branch in the mindmap under "Formulas".
+
+Question: {question}"""
+
+        prompt = PromptTemplate(
+            template=study_plan_prompt,
+            input_variables=["context", "question"]  # ONLY these two
+        )
+   
+        # Create retrieval chain
+        qa_chain = RetrievalQA.from_chain_type(
+            llm=llm,
+            chain_type="stuff",
+            retriever=vectorstore.as_retriever(search_kwargs={"k": 5}),
+            chain_type_kwargs={"prompt": prompt}
+        )
+        
+        # Generate study plan - include all details in the query string
+        query = f"Create a comprehensive study plan for '{topic}' covering {days} days from {start_date} to {end_date}. Ensure the daily schedule has {days} entries with proper dates and times."
+        
+        result = qa_chain.invoke({"query": query})  # ONLY pass query
+        
+        # Parse result
+        result_text = result.get('result', '')
+        
+        # Extract JSON
+        try:
+            start_idx = result_text.find('{')
+            end_idx = result_text.rfind('}') + 1
+            if start_idx != -1 and end_idx > start_idx:
+                json_str = result_text[start_idx:end_idx]
+                plan_data = json.loads(json_str)
+                
+                # Add formatted dates to daily schedule
+                current_date = start
+                if 'studyPlan' in plan_data and 'dailySchedule' in plan_data['studyPlan']:
+                    for day_plan in plan_data['studyPlan']['dailySchedule']:
+                        day_plan['date'] = current_date.strftime('%A, %B %d, %Y')
+                        current_date += timedelta(days=1)
+                
+                return plan_data
+        except json.JSONDecodeError as e:
+            print(f"JSON parsing error: {e}")
+            pass
+        
+        # Fallback
+        return generate_fallback_study_plan(topic, start_date, end_date, days)
+        
+    except Exception as e:
+        print(f"Study plan generation error: {str(e)}")
+        return generate_fallback_study_plan(topic, start_date, end_date, days)
+
 @app.route('/health', methods=['GET'])
 def health_check():
     return jsonify({'status': 'healthy'}), 200
@@ -230,7 +397,7 @@ def extract_text():
         return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
+       
 @app.route('/generate-quiz', methods=['POST'])
 def generate_quiz():
     try:
@@ -253,6 +420,30 @@ def generate_quiz():
         
     except Exception as e:
         print(f"Error in generate_quiz: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/generate-study-plan', methods=['POST'])
+def generate_study_plan():
+    try:
+        data = request.json
+        
+        topic = data.get('topic', '')
+        start_date = data.get('startDate', '')
+        end_date = data.get('endDate', '')
+        notes = data.get('notes', [])
+        
+        if not topic or not start_date or not end_date or not notes:
+            return jsonify({'error': 'Missing required fields'}), 400
+        
+        # Generate study plan and mindmap
+        plan_data = generate_study_plan_with_mindmap(
+            notes, topic, start_date, end_date
+        )
+        
+        return jsonify(plan_data), 200
+        
+    except Exception as e:
+        print(f"Error in generate_study_plan: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

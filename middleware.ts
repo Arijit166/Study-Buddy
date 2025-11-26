@@ -19,5 +19,6 @@ export const config = {
     "/notes/:path*",
     "/profile/:path*",
     "/quizzes/:path*",
+    "/study-plan/:path*"
   ],
 };

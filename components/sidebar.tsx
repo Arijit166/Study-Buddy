@@ -2,16 +2,17 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { LayoutDashboard, BookOpen, MessageSquare, Lightbulb, BarChart3, User, LogOut } from "lucide-react"
+import { LayoutDashboard, BookOpen, MessageSquare, Lightbulb, BarChart3, User, LogOut, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: BookOpen, label: "My Notes", href: "/notes" },
-  { icon: MessageSquare, label: "AI Chat", href: "/chat", dynamic: true }, // Mark as dynamic
+  { icon: MessageSquare, label: "AI Chat", href: "/chat", dynamic: true },
   { icon: Lightbulb, label: "Flashcards", href: "/flashcards" },
+  { icon: Calendar, label: "Study Plan", href: "/study-plan" }, // New item
   { icon: BarChart3, label: "Quizzes", href: "/quizzes" },
   { icon: User, label: "Profile", href: "/profile" },
 ]
@@ -43,15 +44,12 @@ export function Sidebar() {
 
   const handleNavClick = async (item: typeof navItems[0]) => {
     if (item.label === "AI Chat") {
-      // Check if we're currently viewing a note/chat
       const currentNoteId = pathname.match(/\/chat\/([a-zA-Z0-9]+)/)?.[1]
       
       if (currentNoteId) {
-        // If already in a chat, stay on that note
         return
       }
       
-      // Only redirect to last chat if coming from somewhere else
       try {
         const res = await fetch('/api/chat/last')
         const data = await res.json()
@@ -70,7 +68,6 @@ export function Sidebar() {
   return (
     <>
       <aside className="w-64 h-screen bg-sidebar border-r border-sidebar-border flex flex-col">
-        {/* Logo */}
         <div className="px-6 py-8 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
@@ -83,7 +80,6 @@ export function Sidebar() {
           </div>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon
@@ -129,7 +125,6 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* Footer */}
         <div className="px-3 py-4 border-t border-sidebar-border">
           <Button
             onClick={() => setShowLogoutDialog(true)}
@@ -143,7 +138,6 @@ export function Sidebar() {
         </div>
       </aside>
 
-      {/* Logout Confirmation Dialog */}
       {showLogoutDialog && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-card border border-border rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
