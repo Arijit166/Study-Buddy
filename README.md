@@ -49,6 +49,20 @@ The system combines a modern Next.js frontend with Python microservices for OCR,
 - ✨ Also suggests important questions extracted from your notes
 (great for revision)
 
+## 🗓️ AI-Generated Study Plan
+
+Study Buddy can generate a personalized study plan based on your uploaded notes and selected subjects.
+
+- 📘 Analyses all your uploaded notes
+
+- ⏳ Creates a structured study schedule based on difficulty
+
+- 🎯 Breaks chapters into manageable tasks
+
+- 🪄 Uses RAG + LangChain for context-aware planning
+
+- 📆 Supports daily, weekly, and exam-focused plans
+
 ## ❓ Quiz Generator
 
 You can generate quizzes from:
@@ -77,7 +91,7 @@ cd open-service
 python open_service.py
 ```
 - Will run on localhost 5000
-### Quiz Generator Service
+### Quiz Generator & Study Plan Service
 
 **Location: python-service**
 <br>
