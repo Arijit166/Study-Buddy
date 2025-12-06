@@ -142,7 +142,7 @@ export default function QuizSetup({ onGenerate }: QuizSetupProps) {
               />
               
               {searchResults.length > 0 && (
-                <div className="absolute z-10 w-full mt-2 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-2 bg-gray-900 border border-gray-800 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   {searchResults.map((result) => (
                     <button
                       key={result.id}
@@ -151,7 +151,7 @@ export default function QuizSetup({ onGenerate }: QuizSetupProps) {
                         setSearchQuery(result.name)
                         setSearchResults([])
                       }}
-                      className="w-full p-3 text-left hover:bg-muted transition-colors flex items-center gap-3"
+                      className="w-full p-3 text-left hover:bg-gray-800 transition-colors flex items-center gap-3"
                     >
                       {result.type === 'note' ? (
                         <FileText className="w-5 h-5 text-blue-500" />

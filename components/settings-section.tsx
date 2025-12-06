@@ -50,7 +50,7 @@ export function SettingsSection() {
   return (
     <div className="space-y-6">
       {/* Danger Zone */}
-      <Card className="border-0 shadow-md border border-red-200 bg-red-50">
+      <Card className="border-0 shadow-md border border-red-900/30 bg-gray-900/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-red-600">
             <Trash2 className="w-5 h-5" />

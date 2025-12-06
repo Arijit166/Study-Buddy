@@ -1,0 +1,14 @@
+/* Calendar popup background */
+input[type="date"].calendar-custom::-webkit-calendar-picker-indicator {
+  filter: invert(50%) sepia(80%) hue-rotate(200deg) saturate(300%);
+}
+
+/* Input Styling */
+.calendar-custom {
+  border-color: #6b46c1 !important; /* Purple border */
+}
+
+.calendar-custom:focus {
+  border-color: #805ad5 !important;
+  box-shadow: 0 0 0 2px rgba(128, 90, 213, 0.3);
+}

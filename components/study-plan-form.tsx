@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Calendar, BookOpen, Loader2 } from "lucide-react"
+import "./calendar.css"
 
 interface Note {
   _id: string
@@ -120,10 +121,9 @@ export function StudyPlanForm({ onGenerate, isGenerating }: StudyPlanFormProps) 
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-4 py-2 pl-10 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  disabled={isGenerating}
+                  className="calendar-custom w-full px-4 py-2 pl-10 rounded-lg border bg-background text-foreground focus:ring-2 focus:ring-primary"
                 />
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 text-muted-foreground" />
               </div>
             </div>
 
@@ -136,10 +136,9 @@ export function StudyPlanForm({ onGenerate, isGenerating }: StudyPlanFormProps) 
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full px-4 py-2 pl-10 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  disabled={isGenerating}
+                  className="calendar-custom w-full px-4 py-2 pl-10 rounded-lg border bg-background text-foreground focus:ring-2 focus:ring-primary"
                 />
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 text-muted-foreground" />
               </div>
             </div>
           </div>
