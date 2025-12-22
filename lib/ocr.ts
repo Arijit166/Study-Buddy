@@ -13,7 +13,7 @@ async function extractTextWithPyMuPDF(fileBuffer: Buffer, mimeType: string): Pro
   try {
     const base64File = fileBuffer.toString('base64')
     
-    const response = await fetch('http://localhost:5000/extract', {
+    const response = await fetch('https://study-buddy-qi3u.onrender.com/extract', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

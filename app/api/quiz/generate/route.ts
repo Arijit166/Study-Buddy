@@ -6,7 +6,7 @@ import Note from "@/models/Note";
 import FlashcardDeck from "@/models/Flashcard";
 
 // Python microservice URL
-const PYTHON_SERVICE_URL = process.env.PYTHON_SERVICE_URL || "http://localhost:8000";
+const PYTHON_SERVICE_URL = process.env.PYTHON_SERVICE_URL || "https://arijit070-study-buddy1.hf.space";
 
 async function extractTextFromNote(noteId: string, userId: string) {
   await connectDB();

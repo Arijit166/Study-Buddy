@@ -3,7 +3,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { connectDB } from '@/lib/mongodb';
 import Note from '@/models/Note';
 
-const PYTHON_SERVICE_URL = process.env.PYTHON_SERVICE_URL || 'http://localhost:8000';
+const PYTHON_SERVICE_URL = process.env.PYTHON_SERVICE_URL || 'https://arijit070-study-buddy1.hf.space';
 
 export async function POST(req: NextRequest) {
   try {
