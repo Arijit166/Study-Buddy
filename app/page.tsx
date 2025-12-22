@@ -1,15 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-// Remove this: import { signIn } from 'next-auth/react';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function LoginPage() {
+function LoginContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -23,7 +22,6 @@ export default function LoginPage() {
       setError('Unable to sign in with Google. Please try again.');
     }
     
-    // Clear error from URL
     if (errorParam) {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -54,7 +52,6 @@ export default function LoginPage() {
         return;
       }
 
-      // Success - redirect to dashboard
       router.push("/dashboard");
       router.refresh();
       
@@ -67,7 +64,6 @@ export default function LoginPage() {
   const handleGoogleSignIn = () => {
     setIsLoading(true);
     setError('');
-    // Redirect to Google OAuth (without signup flag)
     window.location.href = '/api/auth/google';
   };
 
@@ -150,5 +146,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }
