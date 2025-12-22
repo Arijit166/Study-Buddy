@@ -2,42 +2,53 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { connectDB } from '@/lib/mongodb';
 import User from '@/models/User';
+import { del } from '@vercel/blob';
 
 export async function PATCH(request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const userSession = cookieStore.get('user_session');
-
     if (!userSession) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
     const sessionData = JSON.parse(userSession.value);
     const { firstName, lastName, avatar } = await request.json();
 
-    await connectDB();
+    // Delete old avatar from Vercel Blob if updating to a new one
+    if (avatar !== undefined && sessionData.avatar && avatar !== sessionData.avatar) {
+      try {
+        await del(sessionData.avatar);
+      } catch (error) {
+        console.error('Failed to delete old avatar:', error);
+      }
+    }
 
+    await connectDB();
     const updateData: any = {
       firstName: firstName || sessionData.firstName,
       lastName: lastName || sessionData.lastName || '',
     };
-
     if (avatar === null) {
+      // Delete avatar from Vercel Blob when removing
+      if (sessionData.avatar) {
+        try {
+          await del(sessionData.avatar);
+        } catch (error) {
+          console.error('Failed to delete avatar:', error);
+        }
+      }
       updateData.avatar = null;
     } else if (avatar !== undefined) {
       updateData.avatar = avatar;
     }
-
     const updatedUser = await User.findByIdAndUpdate(
       sessionData.userId,
       updateData,
       { new: true, runValidators: true }
     ).select('-password');
-
     if (!updatedUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-
     const updatedSession = {
       userId: updatedUser._id.toString(),
       firstName: updatedUser.firstName,
@@ -47,12 +58,10 @@ export async function PATCH(request: NextRequest) {
       avatar: updatedUser.avatar || undefined,
       createdAt: updatedUser.createdAt,
     };
-
     const response = NextResponse.json({ 
       user: updatedSession,
       message: 'Profile updated successfully' 
     }, { status: 200 });
-
     response.cookies.set('user_session', JSON.stringify(updatedSession), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -60,9 +69,7 @@ export async function PATCH(request: NextRequest) {
       maxAge: 60 * 60 * 24 * 7,
       path: '/'
     });
-
     return response;
-
   } catch (error) {
     console.error('Profile update error:', error);
     return NextResponse.json({ 
